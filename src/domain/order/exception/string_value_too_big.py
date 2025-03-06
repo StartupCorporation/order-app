@@ -1,9 +1,9 @@
 from dw_shared_kernel import DomainException
 
 
-class OrderCommentCantBeEmtpy(DomainException):
+class StringValueTooBig(DomainException):
     def __init__(
         self,
-        detail: str = "Order comment cant be empty.",
+        detail: str = "Provided string value is too big.",
     ):
         super().__init__(detail)
