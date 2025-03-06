@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from typing import cast
 from uuid import uuid4
 
@@ -7,9 +8,9 @@ from dw_shared_kernel import (
     EventMixin,
 )
 
+from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
+from domain.order.exception.string_value_too_big import StringValueTooBig
 from domain.order.exception.order_cant_contain_no_products import OrderCantContainNoProducts
-from domain.order.exception.order_comment_cant_be_empty import OrderCommentCantBeEmtpy
-from domain.order.exception.order_comment_too_long import OrderCommentTooLong
 from domain.order.exception.only_new_order_can_be_marked_as_processing import OnlyNewOrderCanBeMarkedAsProcessing
 from domain.order.exception.invalid_order_status import InvalidOrderStatus
 from domain.order.exception.not_new_order_cant_fail_products_reservation import NotNewOrderCantFailProductsReservation
@@ -27,6 +28,7 @@ class Order(Entity, EventMixin):
     client_personal_info: ClientPersonalInformation
     ordered_products: list[OrderedProduct]
     status: OrderStatus
+    created_at: datetime
 
     @classmethod
     def new(
@@ -38,7 +40,7 @@ class Order(Entity, EventMixin):
         status: OrderStatus,
     ) -> "Order":
         cls._check_client_comment(client_comment=client_comment)
-        cls._check_ordered_products(ordered_products=ordered_products)
+        cls._check_order_has_products(ordered_products=ordered_products)
 
         return cls(
             id=uuid4(),
@@ -47,6 +49,7 @@ class Order(Entity, EventMixin):
             client_personal_info=client_personal_info,
             ordered_products=ordered_products,
             status=status,
+            created_at=datetime.now(),
         )
 
     def reserve_ordered_products(self) -> None:
@@ -103,13 +106,13 @@ class Order(Entity, EventMixin):
 
     @staticmethod
     def _check_client_comment(client_comment: str | None) -> None:
-        if not (client_comment is None or client_comment):
-            raise OrderCommentCantBeEmtpy()
+        if not (client_comment is None or client_comment.strip()):
+            raise StringCantBeEmpty("Order comment can't be empty.")
 
         if len(cast(str, client_comment)) > 512:
-            raise OrderCommentTooLong()
+            raise StringValueTooBig("Order comment too long.")
 
     @staticmethod
-    def _check_ordered_products(ordered_products: list[OrderedProduct]) -> None:
+    def _check_order_has_products(ordered_products: list[OrderedProduct]) -> None:
         if not ordered_products:
             raise OrderCantContainNoProducts()

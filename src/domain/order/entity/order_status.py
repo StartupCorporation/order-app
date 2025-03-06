@@ -8,6 +8,12 @@ from dw_shared_kernel import (
     ValueNameEnum,
 )
 
+from domain.order.exception.new_order_status_code_duplicates_builtin_codes import (
+    NewOrderStatusCodeDuplicatesBuiltInCode,
+)
+from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
+from domain.order.exception.string_value_too_big import StringValueTooBig
+
 
 @dataclass(kw_only=True)
 class OrderStatus(Entity):
@@ -22,6 +28,7 @@ class OrderStatus(Entity):
         name: str,
         description: str | None,
     ) -> "OrderStatus":
+        cls._check_new_code_isnt_builtin(code=code)
         cls._check_code(code=code)
         cls._check_description(description=description)
         cls._check_name(name=name)
@@ -35,24 +42,26 @@ class OrderStatus(Entity):
 
     @staticmethod
     def _check_code(code: str) -> None:
-        if code in BuiltInOrderStatus:
-            raise
-
         if len(code) > 128:
-            raise
+            raise StringValueTooBig("Order status's code too big.")
+
+    @staticmethod
+    def _check_new_code_isnt_builtin(code: str) -> None:
+        if code in BuiltInOrderStatus:
+            raise NewOrderStatusCodeDuplicatesBuiltInCode()
 
     @staticmethod
     def _check_name(name: str) -> None:
         if len(name) >= 128:
-            raise
+            raise StringValueTooBig("Order status's name too big.")
 
     @staticmethod
     def _check_description(description: str | None) -> None:
-        if not (description is None or description):
-            raise
+        if not (description is None or description.strip()):
+            raise StringCantBeEmpty("Order status's description can't be empty string.")
 
         if len(cast(str, description)) > 512:
-            raise
+            raise StringValueTooBig("Order status's description too big.")
 
     @property
     def is_new(self) -> bool:
