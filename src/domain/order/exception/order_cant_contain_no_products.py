@@ -6,4 +6,4 @@ class OrderCantContainNoProducts(DomainException):
         self,
         detail: str = "Order cant contain no products.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

@@ -1,11 +1,16 @@
 from dataclasses import dataclass
 from datetime import datetime
-from typing import cast
+from enum import auto
+from typing import ClassVar, cast
 from uuid import uuid4
 
 from dw_shared_kernel import (
+    ChangeTrackerMixin,
     Entity,
     EventMixin,
+    Change,
+    ValueCreatedChange,
+    ValueNameEnum,
 )
 
 from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
@@ -22,7 +27,7 @@ from domain.order.value_object.order_product import OrderedProduct
 
 
 @dataclass(kw_only=True)
-class Order(Entity, EventMixin):
+class Order(Entity, EventMixin, ChangeTrackerMixin):
     customer_comment: str | None
     message_customer: bool
     customer_personal_info: CustomerPersonalInformation
@@ -42,7 +47,7 @@ class Order(Entity, EventMixin):
         cls._check_customer_comment(customer_comment=customer_comment)
         cls._check_order_has_products(ordered_products=ordered_products)
 
-        return cls(
+        new_order = cls(
             id=uuid4(),
             customer_comment=customer_comment,
             message_customer=message_customer,
@@ -51,6 +56,11 @@ class Order(Entity, EventMixin):
             status=status,
             created_at=datetime.now(),
         )
+        new_order._add_change(
+            change=ValueCreatedChange(),
+        )
+
+        return new_order
 
     def reserve_ordered_products(self) -> None:
         if not self.status.is_new:
@@ -63,7 +73,7 @@ class Order(Entity, EventMixin):
             ),
         )
 
-    def mark_for_processing(
+    def start_processing(
         self,
         order_status: OrderStatus,
     ) -> None:
@@ -102,6 +112,13 @@ class Order(Entity, EventMixin):
         self,
         order_status: OrderStatus,
     ) -> None:
+        if not self._has_change(change_name=OrderEntityChangeName.INITIAL_STATUS_REPLACED):
+            self._add_change(
+                change=InitialStatusReplacedChange(
+                    initial_status=self.status,
+                ),
+            )
+
         self.status = order_status
 
     @staticmethod
@@ -116,3 +133,13 @@ class Order(Entity, EventMixin):
     def _check_order_has_products(ordered_products: list[OrderedProduct]) -> None:
         if not ordered_products:
             raise OrderCantContainNoProducts()
+
+
+class OrderEntityChangeName(ValueNameEnum):
+    INITIAL_STATUS_REPLACED = auto()
+
+
+@dataclass(kw_only=True, frozen=True)
+class InitialStatusReplacedChange(Change):
+    name: ClassVar[str] = OrderEntityChangeName.INITIAL_STATUS_REPLACED
+    initial_status: OrderStatus

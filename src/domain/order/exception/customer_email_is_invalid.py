@@ -6,4 +6,4 @@ class CustomerEmailIsInvalid(DomainException):
         self,
         detail: str = "Provided customer's email is not valid.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

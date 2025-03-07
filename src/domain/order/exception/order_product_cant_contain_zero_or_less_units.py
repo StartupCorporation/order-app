@@ -6,4 +6,4 @@ class OrderedProductCantContainZeroOrLessUnits(DomainException):
         self,
         detail: str = "Ordered product can't contain zero or less units.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)
