@@ -8,7 +8,12 @@ from dw_shared_kernel import (
 )
 
 from interface.queue.config import config
-from interface.queue.contracts.product.product_deleted import ProductDeletedEventInputContract
+from interface.queue.routes.order.contracts.order_products_are_reserved import (
+    OrderProductsAreReservedEventInputContract,
+)
+from interface.queue.routes.order.contracts.failed_to_reserve_order_products import (
+    FailedToReserveOrderProductsEventInputContract,
+)
 
 
 router = RabbitRouter()
@@ -16,13 +21,13 @@ router = RabbitRouter()
 
 @router.subscriber(
     queue=RabbitQueue(
-        name=config.PRODUCT_QUEUE,
+        name=config.QUEUE,
         passive=True,
     ),
-    description="Handles events for the products.",
+    description="Handles events for the orders.",
 )
 async def handle_product_event(
-    event: ProductDeletedEventInputContract,
+    event: OrderProductsAreReservedEventInputContract | FailedToReserveOrderProductsEventInputContract,
     container: Annotated[Container, Context()],
 ) -> None:
     await container[CommandBus].handle(event.data.to_command())

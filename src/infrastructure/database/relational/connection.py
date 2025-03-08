@@ -1,54 +1,45 @@
-from asyncio import current_task
+import asyncio
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
-from functools import cached_property
-from typing import AsyncContextManager
+from contextvars import ContextVar
 
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    AsyncEngine,
-    create_async_engine,
-    async_sessionmaker,
-    async_scoped_session,
-)
+from asyncpg import Connection, Pool, create_pool
 
 from infrastructure.settings.database import DatabaseSettings
 
 
-class SQLDatabaseConnectionManager:
+class SQLConnectionManager:
     def __init__(
         self,
-        settings: DatabaseSettings,
-    ) -> None:
-        self._settings = settings
+        database_settings: DatabaseSettings,
+    ):
+        self._database_settings = database_settings
+        self._connection_pool = None
+        self._current_connection = ContextVar("_current_connection")
 
     @asynccontextmanager
-    async def session(self) -> AsyncContextManager[AsyncSession]:
-        explicit_session_key = "explicit_session"
-        session = self._session()
-        explicit_session = session.info.get(explicit_session_key, False)
-        session.info[explicit_session_key] = True
+    async def connect(self) -> AsyncIterator[Connection]:
+        connection_pool = await self._get_connection_pool()
 
-        try:
-            yield session
-        finally:
-            if not explicit_session:
-                await session.close()
-                del session.info[explicit_session_key]
+        current_task = asyncio.current_task()
+        if not current_task:
+            raise
 
-    @cached_property
-    def _engine(self) -> AsyncEngine:
-        return create_async_engine(self._settings.get_database_url("postgresql+asyncpg"))
+        task_context = current_task.get_context()
 
-    @cached_property
-    def _session_factory(self) -> async_sessionmaker[AsyncSession]:
-        return async_sessionmaker(
-            bind=self._engine,
-            expire_on_commit=True,
-        )
+        if self._current_connection in task_context:
+            yield task_context[self._current_connection]
+        else:
+            async with connection_pool.acquire() as connection:
+                self._current_connection.set(connection)
+                yield connection
+                self._current_connection.set(None)
 
-    @cached_property
-    def _session(self) -> async_scoped_session[AsyncSession]:
-        return async_scoped_session(
-            session_factory=self._session_factory,
-            scopefunc=current_task,
-        )
+    async def _get_connection_pool(self) -> Pool:
+        if not self._connection_pool:
+            self._connection_pool = await create_pool(
+                database=self._database_settings.connection_url,
+            )
+            # TODO: Add logic to close the connection pool on application shutdown
+
+        return self._connection_pool
