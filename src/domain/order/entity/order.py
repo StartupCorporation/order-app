@@ -1,16 +1,11 @@
 from dataclasses import dataclass
 from datetime import datetime
-from enum import auto
-from typing import ClassVar, cast
+from typing import cast
 from uuid import uuid4
 
 from dw_shared_kernel import (
-    ChangeTrackerMixin,
     Entity,
     EventMixin,
-    Change,
-    ValueCreatedChange,
-    ValueNameEnum,
 )
 
 from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
@@ -27,7 +22,7 @@ from domain.order.value_object.order_product import OrderedProduct
 
 
 @dataclass(kw_only=True)
-class Order(Entity, EventMixin, ChangeTrackerMixin):
+class Order(Entity, EventMixin):
     customer_comment: str | None
     message_customer: bool
     customer_personal_info: CustomerPersonalInformation
@@ -55,9 +50,6 @@ class Order(Entity, EventMixin, ChangeTrackerMixin):
             ordered_products=ordered_products,
             status=status,
             created_at=datetime.now(),
-        )
-        new_order._add_change(
-            change=ValueCreatedChange(),
         )
 
         return new_order
@@ -112,13 +104,6 @@ class Order(Entity, EventMixin, ChangeTrackerMixin):
         self,
         order_status: OrderStatus,
     ) -> None:
-        if not self._has_change(change_name=OrderEntityChangeName.INITIAL_STATUS_REPLACED):
-            self._add_change(
-                change=InitialStatusReplacedChange(
-                    initial_status=self.status,
-                ),
-            )
-
         self.status = order_status
 
     @staticmethod
@@ -133,13 +118,3 @@ class Order(Entity, EventMixin, ChangeTrackerMixin):
     def _check_order_has_products(ordered_products: list[OrderedProduct]) -> None:
         if not ordered_products:
             raise OrderCantContainNoProducts()
-
-
-class OrderEntityChangeName(ValueNameEnum):
-    INITIAL_STATUS_REPLACED = auto()
-
-
-@dataclass(kw_only=True, frozen=True)
-class InitialStatusReplacedChange(Change):
-    name: ClassVar[str] = OrderEntityChangeName.INITIAL_STATUS_REPLACED
-    initial_status: OrderStatus
