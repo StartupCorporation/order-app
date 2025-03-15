@@ -14,12 +14,12 @@ class OrderCreated(IntegrationEvent):
     products: list[OrderedProduct]
 
     def serialize(self) -> dict:
-        serialized_event = super().serialize()
+        serialized_event = super(OrderCreated, self).serialize()
         serialized_event["data"] = {
             "order_id": self.order_id,
             "products": [
                 {
-                    "product_id": str(product.product_id),
+                    "product_id": product.product_id,
                     "quantity": product.quantity,
                 }
                 for product in self.products

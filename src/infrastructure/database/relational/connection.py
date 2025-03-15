@@ -4,8 +4,8 @@ from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
 from asyncpg import Connection
-
 import asyncpg
+
 from infrastructure.settings.database import DatabaseSettings
 
 

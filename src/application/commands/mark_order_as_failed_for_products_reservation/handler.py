@@ -1,9 +1,10 @@
+from dw_shared_kernel import CommandHandler
+
 from application.commands.mark_order_as_failed_for_products_reservation.command import (
     MarkOrderAsFailedForProductsReservationCommand,
 )
 from domain.order.repository.order import OrderRepository
 from domain.order.service.order import OrderService
-from dw_shared_kernel import CommandHandler
 
 
 class MarkOrderAsFailedForProductsReservationCommandHandler(

@@ -24,8 +24,7 @@ class SQLTransactionManager:
         if self._is_transaction_running in task_context:
             yield
         else:
-            async with self._connection_manager.connect() as connection:
-                async with connection.transaction():
-                    self._is_transaction_running.set(True)
-                    yield
-                    self._is_transaction_running.set(None)
+            async with self._connection_manager.connect() as connection, connection.transaction():
+                self._is_transaction_running.set(True)
+                yield
+                self._is_transaction_running.set(None)

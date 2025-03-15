@@ -1,6 +1,6 @@
-from domain.order.repository.order import OrderRepository
 from dw_shared_kernel import CommandHandler
 
+from domain.order.repository.order import OrderRepository
 from domain.order.service.order import OrderService
 from application.commands.start_order_processing.command import StartOrderProcessingCommand
 

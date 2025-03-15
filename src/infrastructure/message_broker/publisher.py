@@ -1,6 +1,7 @@
 from aio_pika import Message
 from aio_pika.abc import AbstractExchange, DeliveryMode
 from dw_shared_kernel import MessageBrokerPublisher
+
 from infrastructure.message_broker.connection import RabbitMQConnectionManager
 from infrastructure.message_broker.destination import RabbitMQEventDestination
 
