@@ -42,10 +42,10 @@ class OrderService:
 
         new_order.reserve_ordered_products()
 
+        await self._order_repository.save(entity=new_order)
+
         for event in new_order.flush_events():
             await self._event_bus.publish(event=event)
-
-        await self._order_repository.save(entity=new_order)
 
     async def mark_order_as_failed_for_products_reservation(
         self,
@@ -61,6 +61,8 @@ class OrderService:
             )
 
         order.mark_as_failed_for_products_reservation(order_status=order_status)
+
+        await self._order_repository.save(entity=order)
 
     async def start_order_processing(
         self,

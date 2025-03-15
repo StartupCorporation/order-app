@@ -100,7 +100,7 @@ class Order(Entity, EventMixin, ChangeTrackerMixin):
         if not self.status.is_new:
             raise NotNewOrderCantFailProductsReservation()
 
-        if order_status.is_products_reservation_failed:
+        if not order_status.is_products_reservation_failed:
             raise InvalidOrderStatus(
                 f"You have to provide {BuiltInOrderStatus.PRODUCTS_RESERVATION_FAILED} "
                 "status for failed products reservation.",

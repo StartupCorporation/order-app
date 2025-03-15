@@ -3,17 +3,7 @@ name = "order-app"
 version = "0.0.1"
 description = "The order microservice application."
 requires-python = ">=3.13"
-dependencies = [
-    "pydantic-settings",
-    "pydantic",
-    "fastapi",
-    "uvicorn",
-    "asyncpg",
-    "faststream[rabbit,cli]",
-    "dw-shared-kernel",
-    "phonenumbers",
-    "email-validator",
-]
+dependencies = []
 
 [project.optional-dependencies]
 local = [
@@ -22,6 +12,31 @@ local = [
     "invoke",
     "ruff",
     "pre-commit",
+]
+web = [
+    "pydantic-settings",
+    "dw-shared-kernel",
+    "phonenumbers",
+    "email-validator",
+    "aio-pika",
+    "pydantic",
+    "asyncpg",
+    "fastapi",
+    "uvicorn",
+]
+migration = [
+    "psycopg2-binary",
+    "yoyo-migrations",
+]
+queue = [
+    "pydantic-settings",
+    "dw-shared-kernel",
+    "phonenumbers",
+    "email-validator",
+    "aio-pika",
+    "pydantic",
+    "asyncpg",
+    "faststream[rabbit,cli]",
 ]
 
 [tool.ruff]

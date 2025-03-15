@@ -9,7 +9,7 @@ from interface.queue.contracts import MessageBrokerEvent
 
 
 type FailedToReserveOrderProductsEventInputContract = MessageBrokerEvent[
-    Literal["ORDER_PRODUCTS_FAILED_TO_RESERVE"],
+    Literal["FAILED_TO_RESERVE_PRODUCTS"],
     FailedToReserveOrderProducts,
 ]
 

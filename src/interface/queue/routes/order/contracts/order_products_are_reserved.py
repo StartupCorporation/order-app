@@ -7,7 +7,7 @@ from interface.queue.contracts import MessageBrokerEvent
 
 
 type OrderProductsAreReservedEventInputContract = MessageBrokerEvent[
-    Literal["ORDER_PRODUCTS_ARE_RESERVED"],
+    Literal["PRODUCTS_RESERVED_FOR_ORDER"],
     OrderProductsAreReserved,
 ]
 

@@ -1,21 +1,13 @@
-import os
-from pathlib import Path
-
+from invoke.collection import Collection
 from invoke.tasks import task
 from invoke.context import Context
 
-
-@task
-def _change_to_root_dir(*_):
-    """
-    Internal pre-task to change working directory to the root directory of the project.
-    """
-    os.chdir(Path(__file__).parent.parent)
+from shared import change_to_root_dir
 
 
 @task(
     name="sync-kernel",
-    pre=[_change_to_root_dir],
+    pre=[change_to_root_dir],
 )
 def sync_shared_kernel(
     context: Context,
@@ -30,20 +22,36 @@ def sync_shared_kernel(
 
 
 @task(
+    name="regenerate",
+    pre=[change_to_root_dir],
+)
+def regenerate_dependencies(
+    context: Context,
+):
+    """
+    Regenerates all dependencies for services.
+    """
+    compile_(context, "requirements/requirements.web.txt", False, "web")
+    compile_(context, "requirements/requirements.queue.txt", False, "queue")
+    compile_(context, "requirements/requirements.migration.txt", False, "migration")
+    compile_(context, "requirements/requirements.txt", True, None)
+
+
+@task(
     name="compile",
     help={
         "extra": "The additional packages section to install.",
-        "output_file": (
-            "The output file where compiled packages will be written.Default is 'requirements/requirements.local.txt'."
-        ),
+        "all_deps": "Whether to install all extra dependencies.",
+        "output_file": "The output file where compiled packages will be written.",
     },
     optional=["extra"],
-    pre=[_change_to_root_dir],
+    pre=[change_to_root_dir],
 )
 def compile_(
     context: Context,
+    output_file: str,
+    all_deps: bool = False,
     extra: str | None = None,
-    output_file: str = "requirements/requirements.local.txt",
 ) -> None:
     """
     Compiles packages from the pyproject.toml file to the output file.
@@ -57,7 +65,9 @@ def compile_(
         "pyproject.toml",
     ]
 
-    if extra:
+    if all_deps:
+        args.insert(0, "--all-extras")
+    elif extra:
         args.insert(0, f"--extra {extra}")
 
     context.run(f"pip-compile {' '.join(args)}")
@@ -68,16 +78,14 @@ def compile_(
 @task(
     help={
         "packages": "The list of packages to upgrade. Must be separeted by whitespace.",
-        "output_file": (
-            "The output file where compiled packages will be written.Default is 'requirements/requirements.local.txt'."
-        ),
+        "output_file": "The output file where compiled packages will be written.",
     },
-    pre=[_change_to_root_dir],
+    pre=[change_to_root_dir],
 )
 def upgrade(
     context: Context,
     packages: str,
-    output_file: str = "requirements/requirements.local.txt",
+    output_file: str,
 ) -> None:
     """
     Upgrades packages that are specified in the args and writes new packages' version to specified file.
@@ -102,16 +110,25 @@ def upgrade(
 
 @task(
     help={
-        "file": "The file containing the packages to install. Default is 'requirements/requirements.local.txt'.",
+        "file": "The file containing the packages to install.",
     },
-    pre=[_change_to_root_dir],
+    pre=[change_to_root_dir],
 )
 def install(
     context: Context,
-    file: str = "requirements/requirements.local.txt",
+    file: str,
 ) -> None:
     """
     Install packages from the provided requirements file.
     """
     context.run(f"pip-sync {file} -q")
     print(f"Successfully installed packages from the '{file}'.")
+
+
+collection = Collection(
+    sync_shared_kernel,
+    regenerate_dependencies,
+    compile_,
+    upgrade,
+    install,
+)
