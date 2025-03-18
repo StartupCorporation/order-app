@@ -6,4 +6,4 @@ class OnlyNewOrderCanBeMarkedAsProcessing(DomainException):
         self,
         detail: str = "Only a new order can be marked as processing.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

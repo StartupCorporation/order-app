@@ -13,7 +13,7 @@ from dw_shared_kernel import (
 from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
 from infrastructure.settings.application import ApplicationSettings
-from interface.web.routes.comment.routes import router as comment_router
+from interface.web.routes.order.routes import router as order_router
 
 
 class WebApplication:
@@ -96,5 +96,5 @@ web_app = WebApplication(
             ApplicationLayer(),
         ),
     ),
-    routes=(comment_router,),
+    routes=(order_router,),
 )

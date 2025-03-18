@@ -6,4 +6,4 @@ class NewOrderStatusCodeDuplicatesBuiltInCode(DomainException):
         self,
         detail: str = "New order status's code duplicates built-in codes.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

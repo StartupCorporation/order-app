@@ -6,4 +6,4 @@ class CustomerPhoneNumberIsInvalid(DomainException):
         self,
         detail: str = "Provided customer's phonen number is not valid.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

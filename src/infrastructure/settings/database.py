@@ -12,8 +12,6 @@ class DatabaseSettings(BaseSettings):
     USERNAME: str
     PASSWORD: str
 
-    def get_database_url(
-        self,
-        driver: str,
-    ) -> str:
-        return f"{driver}://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}"
+    @property
+    def connection_url(self) -> str:
+        return f"postgres://{self.USERNAME}:{self.PASSWORD}@{self.HOST}:{self.PORT}/{self.DATABASE}"

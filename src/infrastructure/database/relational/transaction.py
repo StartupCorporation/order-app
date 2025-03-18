@@ -1,33 +1,30 @@
+import asyncio
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from contextvars import ContextVar
 
-from infrastructure.database.base.transaction import DatabaseTransactionManager
-from infrastructure.database.relational.connection import SQLDatabaseConnectionManager
+from infrastructure.database.relational.connection import SQLConnectionManager
 
 
-class SQLDatabaseTransactionManager(DatabaseTransactionManager):
-
+class SQLTransactionManager:
     def __init__(
         self,
-        connection_manager: SQLDatabaseConnectionManager,
+        connection_manager: SQLConnectionManager,
     ):
         self._connection_manager = connection_manager
+        self._is_transaction_running = ContextVar("_is_transaction_running")
 
     @asynccontextmanager
-    async def begin(self) -> None:
-        explicit_transaction_key = 'explicit_transaction'
+    async def begin(self) -> AsyncIterator[None]:
+        current_task = asyncio.current_task()
+        if not current_task:
+            raise
 
-        async with self._connection_manager.session() as session:
-            explicit_transaction = session.info.get(explicit_transaction_key, False)
-            session.info[explicit_transaction_key] = True
-
-            try:
-                if not (session.in_transaction() or explicit_transaction):
-                    await session.begin()
+        task_context = current_task.get_context()
+        if self._is_transaction_running in task_context:
+            yield
+        else:
+            async with self._connection_manager.connect() as connection, connection.transaction():
+                self._is_transaction_running.set(True)
                 yield
-            except Exception as e:
-                await session.rollback()
-                raise e
-
-            if session.in_transaction() and not explicit_transaction:
-                await session.commit()
-                del session.info[explicit_transaction_key]
+                self._is_transaction_running.set(None)

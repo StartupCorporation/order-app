@@ -14,7 +14,8 @@ class OrderCreated(IntegrationEvent):
     products: list[OrderedProduct]
 
     def serialize(self) -> dict:
-        return {
+        serialized_event = super(OrderCreated, self).serialize()
+        serialized_event["data"] = {
             "order_id": self.order_id,
             "products": [
                 {
@@ -24,6 +25,7 @@ class OrderCreated(IntegrationEvent):
                 for product in self.products
             ],
         }
+        return serialized_event
 
     @classmethod
     def deserialize(

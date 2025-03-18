@@ -42,7 +42,7 @@ class Order(Entity, EventMixin):
         cls._check_customer_comment(customer_comment=customer_comment)
         cls._check_order_has_products(ordered_products=ordered_products)
 
-        return cls(
+        new_order = cls(
             id=uuid4(),
             customer_comment=customer_comment,
             message_customer=message_customer,
@@ -51,6 +51,8 @@ class Order(Entity, EventMixin):
             status=status,
             created_at=datetime.now(),
         )
+
+        return new_order
 
     def reserve_ordered_products(self) -> None:
         if not self.status.is_new:
@@ -63,7 +65,7 @@ class Order(Entity, EventMixin):
             ),
         )
 
-    def mark_for_processing(
+    def start_processing(
         self,
         order_status: OrderStatus,
     ) -> None:
@@ -90,7 +92,7 @@ class Order(Entity, EventMixin):
         if not self.status.is_new:
             raise NotNewOrderCantFailProductsReservation()
 
-        if order_status.is_products_reservation_failed:
+        if not order_status.is_products_reservation_failed:
             raise InvalidOrderStatus(
                 f"You have to provide {BuiltInOrderStatus.PRODUCTS_RESERVATION_FAILED} "
                 "status for failed products reservation.",

@@ -6,4 +6,4 @@ class StringValueTooBig(DomainException):
         self,
         detail: str = "Provided string value is too big.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)

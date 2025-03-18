@@ -11,9 +11,11 @@ class OrderSubmittedForProcessing(IntegrationEvent):
     order_id: UUID
 
     def serialize(self) -> dict:
-        return {
+        serialized_event = super(OrderSubmittedForProcessing, self).serialize()
+        serialized_event["data"] = {
             "order_id": self.order_id,
         }
+        return serialized_event
 
     @classmethod
     def deserialize(

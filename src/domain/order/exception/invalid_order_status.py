@@ -6,4 +6,4 @@ class InvalidOrderStatus(DomainException):
         self,
         detail: str = "Specified status is invalid for the order.",
     ):
-        super().__init__(detail)
+        super().__init__(detail=detail)
