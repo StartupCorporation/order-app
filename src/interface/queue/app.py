@@ -14,7 +14,7 @@ from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
 from infrastructure.settings.application import ApplicationSettings
 from infrastructure.settings.rabbitmq import RabbitMQSettings
-from interface.queue.routes.order.routes import router as order_router
+from interface.queue.routes.order.endpoints import router as order_router
 
 
 class QueueApplication:
