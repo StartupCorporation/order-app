@@ -7,8 +7,6 @@ from domain.order.repository.order import OrderRepository
 from infrastructure.database.relational.mapper.order import OrderEntityMapper
 from infrastructure.database.relational.repository.base import AbstractSQLRepository
 from infrastructure.database.relational.repository.mixin import DomainModelRepositoryMixin
-from infrastructure.database.relational.tables.order import ORDER_TABLE, OrderTableColumn
-from infrastructure.database.relational.tables.order_status import ORDER_STATUS_TABLE, OrderStatusTableColumn
 
 
 class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, OrderRepository):
@@ -25,22 +23,24 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
         self,
         id_: UUID,
     ) -> Order | None:
-        columns_to_select_string = self._get_select_columns_string(
-            *OrderTableColumn.get_all_columns_with_table(),
-            *OrderStatusTableColumn.get_all_columns_with_table(),
-        )
-
-        order_id_col = OrderTableColumn.get_column_with_table(OrderTableColumn.ID)
-        order_order_status_id_col = OrderTableColumn.get_column_with_table(OrderTableColumn.ORDER_STATUS_ID)
-        order_status_id_col = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.ID)
-
         async with self._connection_manager.connect() as cur:
             record = await cur.fetchrow(
-                f"""
-                SELECT {columns_to_select_string}
+                """
+                SELECT
+                    order_.id AS "order_.id",
+                    order_.comment AS "order_.comment",
+                    order_.message_customer AS "order_.message_customer",
+                    order_.created_at AS "order_.created_at",
+                    order_.customer_info AS "order_.customer_info",
+                    order_.products AS "order_.products",
+                    order_.order_status_id AS "order_.order_status_id",
+                    order_status.name AS "order_status.name",
+                    order_status.code AS "order_status.code",
+                    order_status.description AS "order_status.description"
                 FROM
-                    {ORDER_TABLE} JOIN {ORDER_STATUS_TABLE} ON {order_order_status_id_col} = {order_status_id_col}
-                WHERE {order_id_col} = $1
+                    order_ JOIN order_status ON order_.order_status_id = order_status.id
+                WHERE
+                    order_.id = $1
                 """,
                 id_,
             )
@@ -55,8 +55,7 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
         entity: Order,
     ) -> None:
         insert_order_values = self._order_entity_mapper.from_domain_model(model=entity)
-        update_order_values = self._order_entity_mapper.from_domain_model(model=entity)
-        update_order_values.pop(OrderTableColumn.ID)
+        update_order_values = {key: value for key, value in insert_order_values.items() if key != "id"}
 
         insert_placeholders = self._get_inline_placeholders_string(
             amount=len(insert_order_values),
@@ -71,9 +70,9 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
             try:
                 await cur.execute(
                     f"""
-                    INSERT INTO {ORDER_TABLE} ({", ".join(insert_order_values.keys())})
+                    INSERT INTO order_ ({", ".join(insert_order_values.keys())})
                     VALUES ({insert_placeholders})
-                    ON CONFLICT ({OrderTableColumn.ID}) DO UPDATE
+                    ON CONFLICT (id) DO UPDATE
                     SET {
                         ",\n".join(
                             f"{col} = {placeholder}"

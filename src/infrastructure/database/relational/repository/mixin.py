@@ -1,8 +1,4 @@
 class DomainModelRepositoryMixin:
-    @staticmethod
-    def _get_select_columns_string(*args: str) -> str:
-        return ", ".join(f'{column} AS "{column}"' for column in args)
-
     @classmethod
     def _get_inline_placeholders_string(
         cls,

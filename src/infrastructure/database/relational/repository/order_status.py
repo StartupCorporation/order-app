@@ -3,7 +3,6 @@ from domain.order.repository.order_status import OrderStatusRepository
 from infrastructure.database.relational.mapper.order_status import OrderStatusEntityMapper
 from infrastructure.database.relational.repository.base import AbstractSQLRepository
 from infrastructure.database.relational.repository.mixin import DomainModelRepositoryMixin
-from infrastructure.database.relational.tables.order_status import ORDER_STATUS_TABLE, OrderStatusTableColumn
 
 
 class SQLOrderStatusRepository(AbstractSQLRepository, DomainModelRepositoryMixin, OrderStatusRepository):
@@ -20,18 +19,18 @@ class SQLOrderStatusRepository(AbstractSQLRepository, DomainModelRepositoryMixin
         self,
         code: str,
     ) -> OrderStatus | None:
-        columns_to_select_string = self._get_select_columns_string(
-            *OrderStatusTableColumn.get_all_columns_with_table(),
-        )
-
-        order_status_code_col = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.CODE)
-
         async with self._connection_manager.connect() as cur:
             record = await cur.fetchrow(
-                f"""
-                SELECT {columns_to_select_string}
-                FROM {ORDER_STATUS_TABLE}
-                WHERE {order_status_code_col} = $1
+                """
+                SELECT
+                    id AS "order_status.id",
+                    name AS "order_status.name",
+                    code AS "order_status.code",
+                    description AS "order_status.description"
+                FROM
+                    order_status
+                WHERE
+                    order_status.code = $1
                 """,
                 code,
             )

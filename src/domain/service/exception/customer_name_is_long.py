@@ -1,9 +1,9 @@
 from dw_shared_kernel import DomainException
 
 
-class StringCantBeEmpty(DomainException):
+class CustomerNameIsLong(DomainException):
     def __init__(
         self,
-        detail: str = "String value can't be empty.",
+        detail: str = "Customer name is long.",
     ):
         super().__init__(detail=detail)

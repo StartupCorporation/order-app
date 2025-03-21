@@ -16,6 +16,7 @@ def create_new_migration(
     Creates a new migration file.
     """
     context.run("cd src/infrastructure/database/relational/migrations && yoyo new")
+    context.run("rm -rf src/infrastructure/database/relational/migrations/__pycache__")
 
 
 collection = Collection(

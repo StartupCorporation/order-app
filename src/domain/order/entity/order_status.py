@@ -1,21 +1,26 @@
 from dataclasses import dataclass
 from enum import auto
-from typing import cast
 from uuid import uuid4
 
 from dw_shared_kernel import (
     Entity,
+    NotEmptyStringSpecification,
+    StringLengthSpecification,
     ValueNameEnum,
 )
 
 from domain.order.exception.new_order_status_code_duplicates_builtin_codes import (
     NewOrderStatusCodeDuplicatesBuiltInCode,
 )
-from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
-from domain.order.exception.string_value_too_big import StringValueTooBig
+from domain.order.exception.order_status_code_cant_be_empty import OrderStatusCodeCantBeEmpty
+from domain.order.exception.order_status_code_is_long import OrderStatusCodeIsLong
+from domain.order.exception.order_status_description_cant_be_empty import OrderStatusDescriptionCantBeEmpty
+from domain.order.exception.order_status_description_is_long import OrderStatusDescriptionIsLong
+from domain.order.exception.order_status_name_cant_be_empty import OrderStatusNameCantBeEmpty
+from domain.order.exception.order_status_name_is_long import OrderStatusNameIsLong
 
 
-@dataclass(kw_only=True)
+@dataclass(kw_only=True, slots=True)
 class OrderStatus(Entity):
     code: str
     name: str
@@ -28,7 +33,6 @@ class OrderStatus(Entity):
         name: str,
         description: str | None,
     ) -> "OrderStatus":
-        cls._check_new_code_isnt_builtin(code=code)
         cls._check_code(code=code)
         cls._check_description(description=description)
         cls._check_name(name=name)
@@ -42,26 +46,35 @@ class OrderStatus(Entity):
 
     @staticmethod
     def _check_code(code: str) -> None:
-        if len(code) > 128:
-            raise StringValueTooBig("Order status's code too big.")
+        if not NotEmptyStringSpecification(can_be_nullable=False).is_satisfied_by(value=code):
+            raise OrderStatusCodeCantBeEmpty()
 
-    @staticmethod
-    def _check_new_code_isnt_builtin(code: str) -> None:
+        if not StringLengthSpecification(min_length=1, max_length=128).is_satisfied_by(value=code):
+            raise OrderStatusCodeIsLong("Order status's code too big.")
+
         if code in BuiltInOrderStatus:
             raise NewOrderStatusCodeDuplicatesBuiltInCode()
 
     @staticmethod
     def _check_name(name: str) -> None:
-        if len(name) >= 128:
-            raise StringValueTooBig("Order status's name too big.")
+        if not NotEmptyStringSpecification(can_be_nullable=False).is_satisfied_by(value=name):
+            raise OrderStatusNameCantBeEmpty()
+
+        if not StringLengthSpecification(min_length=1, max_length=128).is_satisfied_by(value=name):
+            raise OrderStatusNameIsLong("Order status's name too big.")
 
     @staticmethod
     def _check_description(description: str | None) -> None:
-        if not (description is None or description.strip()):
-            raise StringCantBeEmpty("Order status's description can't be empty string.")
+        if not NotEmptyStringSpecification(can_be_nullable=True).is_satisfied_by(value=description):
+            raise OrderStatusDescriptionCantBeEmpty()
 
-        if len(cast(str, description)) > 512:
-            raise StringValueTooBig("Order status's description too big.")
+        if description and not StringLengthSpecification(
+            min_length=1,
+            max_length=512,
+        ).is_satisfied_by(
+            value=description,
+        ):
+            raise OrderStatusDescriptionIsLong()
 
     @property
     def is_new(self) -> bool:

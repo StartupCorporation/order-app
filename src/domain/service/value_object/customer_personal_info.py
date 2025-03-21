@@ -2,12 +2,12 @@ from dataclasses import dataclass
 
 from email_validator import EmailNotValidError, validate_email
 import phonenumbers
+from dw_shared_kernel import NotEmptyStringSpecification, StringLengthSpecification, ValueObject
 
-from domain.order.exception.customer_phone_number_is_invalid import CustomerPhoneNumberIsInvalid
-from domain.order.exception.customer_email_is_invalid import CustomerEmailIsInvalid
-from domain.order.exception.string_can_be_emtpy import StringCantBeEmpty
-from domain.order.exception.string_value_too_big import StringValueTooBig
-from dw_shared_kernel import ValueObject
+from domain.service.exception.customer_email_is_invalid import CustomerEmailIsInvalid
+from domain.service.exception.customer_name_cant_be_empty import CustomerNameCantBeEmpty
+from domain.service.exception.customer_name_is_long import CustomerNameIsLong
+from domain.service.exception.customer_phone_number_is_invalid import CustomerPhoneNumberIsInvalid
 
 
 @dataclass(kw_only=True, slots=True)
@@ -34,11 +34,11 @@ class CustomerPersonalInformation(ValueObject):
 
     @staticmethod
     def _check_name(name: str) -> None:
-        if not (name is None or name.strip()):
-            raise StringCantBeEmpty("Customer's name can't be empty.")
+        if not NotEmptyStringSpecification(can_be_nullable=False).is_satisfied_by(value=name):
+            raise CustomerNameCantBeEmpty()
 
-        if len(name) > 64:
-            raise StringValueTooBig("Customer's name too big.")
+        if not StringLengthSpecification(min_length=1, max_length=64).is_satisfied_by(value=name):
+            raise CustomerNameIsLong()
 
     @staticmethod
     def _normalize_email(email: str) -> str:
