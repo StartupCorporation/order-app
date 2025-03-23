@@ -51,5 +51,10 @@ class CustomerPersonalInformation(ValueObject):
 
     @staticmethod
     def _check_phone_number(phone_number: str) -> None:
-        if not phonenumbers.is_possible_number(phonenumbers.parse(phone_number)):
+        try:
+            if not phonenumbers.is_possible_number(phonenumbers.parse(phone_number)):
+                raise CustomerPhoneNumberIsInvalid()
+        except phonenumbers.NumberParseException as e:
+            if e.error_type == phonenumbers.NumberParseException.INVALID_COUNTRY_CODE:
+                raise CustomerPhoneNumberIsInvalid("The phone number is specified with an invalid country code.")
             raise CustomerPhoneNumberIsInvalid()

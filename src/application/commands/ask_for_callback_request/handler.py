@@ -18,7 +18,7 @@ class AskForCallbackRequestCommandHandler(CommandHandler[AskForCallbackRequestCo
         command: AskForCallbackRequestCommand,
     ) -> None:
         callback_request = CallbackRequest.new(
-            customer_personal_info=CustomerPersonalInformation(
+            customer_personal_info=CustomerPersonalInformation.new(
                 name=command.customer_personal_information.name,
                 email=command.customer_personal_information.email,
                 phone_number=command.customer_personal_information.phone_number,
