@@ -18,7 +18,7 @@ class CreateOrderInputContract(InputContract):
         str,
         Field(
             examples=["Text me in Telegram, please."],
-            serialization_alias="customer_comment",
+            validation_alias="customerComment",
             description="The customer's note for the order.",
         ),
     ]

@@ -1,4 +1,3 @@
-from domain.service.repository.callback_request import CallbackRequestRepository
 from dw_shared_kernel import Container, IntegrationEventRepository, Layer, CommandBus, EventBus, MessageBrokerPublisher
 
 from domain.order.repository.order import OrderRepository
@@ -6,6 +5,7 @@ from domain.order.events.order_created import OrderCreated
 from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
 from domain.order.repository.order_status import OrderStatusRepository
 from domain.order.service.order import OrderService
+from domain.service.repository.callback_request import CallbackRequestRepository
 from infrastructure.bus.middleware.event_dispatcher import ModelEventDispatcherMiddleware
 from infrastructure.bus.middleware.transaction import TransactionMiddleware
 from infrastructure.database.base.transaction import DatabaseTransactionManager
