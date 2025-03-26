@@ -13,7 +13,8 @@ from dw_shared_kernel import (
 from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
 from infrastructure.settings.application import ApplicationSettings
-from interface.web.routes.order.routes import router as order_router
+from interface.web.routes.order.endpoints import router as order_router
+from interface.web.routes.callback_request.endpoints import router as callback_request_router
 
 
 class WebApplication:
@@ -96,5 +97,8 @@ web_app = WebApplication(
             ApplicationLayer(),
         ),
     ),
-    routes=(order_router,),
+    routes=(
+        order_router,
+        callback_request_router,
+    ),
 )

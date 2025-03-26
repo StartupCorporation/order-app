@@ -2,7 +2,7 @@ from dw_shared_kernel import CommandHandler
 
 from application.commands.create_order.command import CreateOrderCommand
 from domain.order.service.order import OrderService
-from domain.order.value_object.customer_personal_info import CustomerPersonalInformation
+from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
 from domain.order.value_object.order_product import OrderedProduct
 
 
@@ -19,7 +19,7 @@ class CreateOrderCommandHandler(CommandHandler[CreateOrderCommand]):
     ) -> None:
         await self._order_service.create_new_order(
             message_customer=command.message_customer,
-            customer_comment=command.customer_comment,
+            customer_note=command.customer_note,
             customer_personal_information=CustomerPersonalInformation.new(
                 name=command.customer_personal_information.name,
                 email=command.customer_personal_information.email,

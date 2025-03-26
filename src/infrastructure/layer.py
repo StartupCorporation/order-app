@@ -5,12 +5,15 @@ from domain.order.events.order_created import OrderCreated
 from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
 from domain.order.repository.order_status import OrderStatusRepository
 from domain.order.service.order import OrderService
+from domain.service.repository.callback_request import CallbackRequestRepository
 from infrastructure.bus.middleware.event_dispatcher import ModelEventDispatcherMiddleware
 from infrastructure.bus.middleware.transaction import TransactionMiddleware
 from infrastructure.database.base.transaction import DatabaseTransactionManager
 from infrastructure.database.relational.connection import SQLConnectionManager
+from infrastructure.database.relational.mapper.callback_request import CallbackRequestEntityMapper
 from infrastructure.database.relational.mapper.order import OrderEntityMapper
 from infrastructure.database.relational.mapper.order_status import OrderStatusEntityMapper
+from infrastructure.database.relational.repository.callback_request import SQLCallbackRequestRepository
 from infrastructure.database.relational.repository.order import SQLOrderRepository
 from infrastructure.database.relational.repository.order_status import SQLOrderStatusRepository
 from infrastructure.database.relational.transaction import SQLTransactionManager
@@ -64,6 +67,7 @@ class InfrastructureLayer(Layer):
 
         container[OrderEntityMapper] = OrderEntityMapper()
         container[OrderStatusEntityMapper] = OrderStatusEntityMapper()
+        container[CallbackRequestEntityMapper] = CallbackRequestEntityMapper()
 
         container[OrderStatusRepository] = SQLOrderStatusRepository(
             order_status_mapper=container[OrderStatusEntityMapper],
@@ -71,6 +75,10 @@ class InfrastructureLayer(Layer):
         )
         container[OrderRepository] = SQLOrderRepository(
             order_entity_mapper=container[OrderEntityMapper],
+            connection_manager=container[SQLConnectionManager],
+        )
+        container[CallbackRequestRepository] = SQLCallbackRequestRepository(
+            callback_request_entity_mapper=container[CallbackRequestEntityMapper],
             connection_manager=container[SQLConnectionManager],
         )
 

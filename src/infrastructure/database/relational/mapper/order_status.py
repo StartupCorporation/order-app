@@ -3,20 +3,19 @@ from asyncpg import Record
 
 from domain.order.entity.order_status import OrderStatus
 from infrastructure.database.relational.mapper.base import DomainModelTableMapper
-from infrastructure.database.relational.tables.order_status import OrderStatusTableColumn
 
 
-class OrderStatusEntityMapper(DomainModelTableMapper[OrderStatus, Record, OrderStatusTableColumn]):
+class OrderStatusEntityMapper(DomainModelTableMapper[OrderStatus, Record]):
     def from_domain_model(
         self,
         model: OrderStatus,
-    ) -> dict[OrderStatusTableColumn, Any]:
+    ) -> dict[str, Any]:
         values = {}
 
-        values[OrderStatusTableColumn.ID] = model.id
-        values[OrderStatusTableColumn.CODE] = model.code
-        values[OrderStatusTableColumn.NAME] = model.name
-        values[OrderStatusTableColumn.DESCRIPTION] = model.description
+        values["id"] = model.id
+        values["code"] = model.code
+        values["name"] = model.name
+        values["description"] = model.description
 
         return values
 
@@ -24,16 +23,11 @@ class OrderStatusEntityMapper(DomainModelTableMapper[OrderStatus, Record, OrderS
         self,
         data: Record,
     ) -> OrderStatus:
-        order_status_id = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.ID)
-        order_status_code = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.CODE)
-        order_status_name = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.NAME)
-        order_status_description = OrderStatusTableColumn.get_column_with_table(OrderStatusTableColumn.DESCRIPTION)
-
         order_status_entity = OrderStatus(
-            id=data[order_status_id],
-            code=data[order_status_code],
-            name=data[order_status_name],
-            description=data[order_status_description],
+            id=data["order_status.id"],
+            code=data["order_status.code"],
+            name=data["order_status.name"],
+            description=data["order_status.description"],
         )
 
         return order_status_entity

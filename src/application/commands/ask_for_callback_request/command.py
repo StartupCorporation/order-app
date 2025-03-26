@@ -1,19 +1,11 @@
-from uuid import UUID
-
 from dw_shared_kernel import Command
 from pydantic import BaseModel
 
 
-class CreateOrderCommand(Command):
-    ordered_products: list["ProductInput"]
+class AskForCallbackRequestCommand(Command):
     customer_personal_information: "CustomerPersonalInfoInput"
     customer_note: str
     message_customer: bool
-
-
-class ProductInput(BaseModel):
-    product_id: UUID
-    quantity: int
 
 
 class CustomerPersonalInfoInput(BaseModel):
