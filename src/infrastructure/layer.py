@@ -1,8 +1,8 @@
-from dw_shared_kernel import Container, IntegrationEventRepository, Layer, CommandBus, EventBus, MessageBrokerPublisher
+from dw_shared_kernel import CommandBus, Container, EventBus, IntegrationEventRepository, Layer, MessageBrokerPublisher
 
-from domain.order.repository.order import OrderRepository
 from domain.order.events.order_created import OrderCreated
 from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
+from domain.order.repository.order import OrderRepository
 from domain.order.repository.order_status import OrderStatusRepository
 from domain.order.service.order import OrderService
 from domain.service.repository.callback_request import CallbackRequestRepository
@@ -17,9 +17,9 @@ from infrastructure.database.relational.repository.callback_request import SQLCa
 from infrastructure.database.relational.repository.order import SQLOrderRepository
 from infrastructure.database.relational.repository.order_status import SQLOrderStatusRepository
 from infrastructure.database.relational.transaction import SQLTransactionManager
-from infrastructure.message_broker.connection import RabbitMQConnectionManager
-from infrastructure.message_broker.destination import RabbitMQEventDestination
-from infrastructure.message_broker.publisher import RabbitMQPublisher
+from infrastructure.message_broker.rabbitmq.connection import RabbitMQConnectionManager
+from infrastructure.message_broker.rabbitmq.destination import RabbitMQEventDestination
+from infrastructure.message_broker.rabbitmq.publisher import RabbitMQPublisher
 from infrastructure.settings.application import ApplicationSettings
 from infrastructure.settings.database import DatabaseSettings
 from infrastructure.settings.rabbitmq import RabbitMQSettings

@@ -1,4 +1,5 @@
 from typing import Any
+
 from asyncpg import Record
 
 from domain.order.entity.order_status import OrderStatus

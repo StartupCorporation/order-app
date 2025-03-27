@@ -9,9 +9,10 @@ click==8.1.8
 decorator==5.2.1
 distlib==0.3.9
 dnspython==2.7.0
-dw-shared-kernel==0.3.0
+dw-shared-kernel @ git+ssh://git@github.com/StartupCorporation/dw-shared-kernel.git@v0.4.0
 email-validator==2.2.0
 exceptiongroup==1.2.2
+execnet==2.1.1
 executing==2.2.0
 fast-depends==2.4.12
 fastapi==0.115.6
@@ -49,6 +50,8 @@ pydantic-core==2.27.2
 pydantic-settings==2.7.0
 pygments==2.18.0
 pytest==8.3.5
+pytest-asyncio==0.26.0
+pytest-xdist==3.6.1
 python-dotenv==1.0.1
 pyyaml==6.0.2
 rich==13.9.4

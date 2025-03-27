@@ -1,12 +1,12 @@
 from dataclasses import dataclass
 
-from email_validator import EmailNotValidError, validate_email
 import phonenumbers
 from dw_shared_kernel import NotEmptyStringSpecification, StringLengthSpecification, ValueObject
+from email_validator import EmailNotValidError, validate_email
 
 from domain.service.exception.customer_email_is_invalid import CustomerEmailIsInvalid
 from domain.service.exception.customer_name_cant_be_empty import CustomerNameCantBeEmpty
-from domain.service.exception.customer_name_is_long import CustomerNameIsLong
+from domain.service.exception.customer_name_has_invalid_length import CustomerNameHasInvalidLength
 from domain.service.exception.customer_phone_number_is_invalid import CustomerPhoneNumberIsInvalid
 
 
@@ -38,7 +38,7 @@ class CustomerPersonalInformation(ValueObject):
             raise CustomerNameCantBeEmpty()
 
         if not StringLengthSpecification(min_length=1, max_length=64).is_satisfied_by(value=name):
-            raise CustomerNameIsLong()
+            raise CustomerNameHasInvalidLength("Customer name must be greater than 1 and less than 64 characters.")
 
     @staticmethod
     def _normalize_email(email: str) -> str:
@@ -56,5 +56,5 @@ class CustomerPersonalInformation(ValueObject):
                 raise CustomerPhoneNumberIsInvalid()
         except phonenumbers.NumberParseException as e:
             if e.error_type == phonenumbers.NumberParseException.INVALID_COUNTRY_CODE:
-                raise CustomerPhoneNumberIsInvalid("The phone number is specified with an invalid country code.")
+                raise CustomerPhoneNumberIsInvalid("The phone number is specified with invalid country code.")
             raise CustomerPhoneNumberIsInvalid()

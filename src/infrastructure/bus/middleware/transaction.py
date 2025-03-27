@@ -1,4 +1,4 @@
-from typing import Callable, Awaitable, Any
+from typing import Any, Awaitable, Callable
 
 from dw_shared_kernel import BusMiddleware
 

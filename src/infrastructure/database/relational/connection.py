@@ -3,8 +3,8 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
 
-from asyncpg import Connection
 import asyncpg
+from asyncpg import Connection
 
 from infrastructure.settings.database import DatabaseSettings
 

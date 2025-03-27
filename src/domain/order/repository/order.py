@@ -6,6 +6,9 @@ from domain.order.entity.order import Order
 
 class OrderRepository(ABC):
     @abstractmethod
+    async def get_all(self) -> list[Order]: ...
+
+    @abstractmethod
     async def get_by_id(self, id_: UUID) -> Order | None: ...
 
     @abstractmethod

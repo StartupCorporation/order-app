@@ -1,8 +1,8 @@
 from invoke.collection import Collection
-from invoke.tasks import task
 from invoke.context import Context
+from invoke.tasks import task
 
-from shared import change_to_root_dir
+from tasks.shared import change_to_root_dir
 
 
 @task(

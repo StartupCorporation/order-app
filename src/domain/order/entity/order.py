@@ -7,21 +7,23 @@ from dw_shared_kernel import (
     EventMixin,
 )
 
-from domain.order.exception.order_cant_contain_no_products import OrderCantContainNoProducts
-from domain.order.exception.only_new_order_can_be_marked_as_processing import OnlyNewOrderCanBeMarkedAsProcessing
+from domain.order.entity.order_status import BuiltInOrderStatus, OrderStatus
+from domain.order.events.order_created import OrderCreated
+from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
 from domain.order.exception.invalid_order_status import InvalidOrderStatus
 from domain.order.exception.not_new_order_cant_fail_products_reservation import NotNewOrderCantFailProductsReservation
-from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
-from domain.order.events.order_created import OrderCreated
-from domain.order.entity.order_status import BuiltInOrderStatus, OrderStatus
-from domain.order.value_object.order_product import OrderedProduct
+from domain.order.exception.only_new_order_can_be_marked_as_processing import OnlyNewOrderCanBeMarkedAsProcessing
+from domain.order.exception.order_cant_contain_no_products import OrderCantContainNoProducts
+from domain.order.value_object.ordered_product import OrderedProduct
+from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
 from domain.service.value_object.note import Note
 from domain.service.value_object.time_info import TimeInfo
-from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
 
 
 @dataclass(kw_only=True, slots=True)
 class Order(Entity, EventMixin):
+    __hash__ = Entity.__hash__
+
     status: OrderStatus
     ordered_products: list[OrderedProduct]
     customer_personal_info: CustomerPersonalInformation
@@ -47,7 +49,7 @@ class Order(Entity, EventMixin):
             customer_personal_info=customer_personal_info,
             ordered_products=ordered_products,
             status=status,
-            time_info=TimeInfo(
+            time_info=TimeInfo.new(
                 created_at=datetime.now(),
             ),
         )

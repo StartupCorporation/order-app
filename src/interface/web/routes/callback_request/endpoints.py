@@ -1,16 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, status, Depends
 from dw_shared_kernel import (
-    Container,
     CommandBus,
+    Container,
 )
+from fastapi import APIRouter, Body, Depends, status
 
 from interface.web.dependencies.container import get_di_container
 from interface.web.routes.callback_request.contracts.input.ask_for_callback_request import (
     AskForCallbackRequestInputContract,
 )
-
 
 router = APIRouter(
     prefix="/callback_request",

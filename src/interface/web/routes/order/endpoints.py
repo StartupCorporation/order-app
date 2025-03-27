@@ -1,14 +1,13 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, status, Depends
 from dw_shared_kernel import (
-    Container,
     CommandBus,
+    Container,
 )
+from fastapi import APIRouter, Body, Depends, status
 
 from interface.web.dependencies.container import get_di_container
 from interface.web.routes.order.contracts.input.create_order import CreateOrderInputContract
-
 
 router = APIRouter(
     prefix="/order",

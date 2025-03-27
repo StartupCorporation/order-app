@@ -7,7 +7,7 @@ from pydantic import BaseModel
 class CreateOrderCommand(Command):
     ordered_products: list["ProductInput"]
     customer_personal_information: "CustomerPersonalInfoInput"
-    customer_note: str
+    customer_note: str | None
     message_customer: bool
 
 

@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class AskForCallbackRequestCommand(Command):
     customer_personal_information: "CustomerPersonalInfoInput"
-    customer_note: str
+    customer_note: str | None
     message_customer: bool
 
 

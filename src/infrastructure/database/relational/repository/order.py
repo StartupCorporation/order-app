@@ -19,6 +19,9 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
         super().__init__(*args, **kwargs)
         self._order_entity_mapper = order_entity_mapper
 
+    async def get_all(self) -> list[Order]:
+        raise NotImplementedError()
+
     async def get_by_id(
         self,
         id_: UUID,
