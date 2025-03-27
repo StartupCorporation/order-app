@@ -15,6 +15,12 @@ class SQLOrderStatusRepository(AbstractSQLRepository, DomainModelRepositoryMixin
         super().__init__(*args, **kwargs)
         self._order_status_mapper = order_status_mapper
 
+    async def save(
+        self,
+        entity: OrderStatus,
+    ) -> None:
+        raise NotImplementedError()
+
     async def get_by_code(
         self,
         code: str,

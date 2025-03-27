@@ -1,20 +1,20 @@
-from typing import Iterable, Awaitable, Callable
+from typing import Awaitable, Callable, Iterable
 
-from fastapi import FastAPI, Request, APIRouter, status
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
 from dw_shared_kernel import (
-    DomainException,
     Container,
-    get_di_container,
+    DomainException,
     SharedKernelInfrastructureLayer,
+    get_di_container,
 )
+from fastapi import APIRouter, FastAPI, Request, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
 from infrastructure.settings.application import ApplicationSettings
-from interface.web.routes.order.endpoints import router as order_router
 from interface.web.routes.callback_request.endpoints import router as callback_request_router
+from interface.web.routes.order.endpoints import router as order_router
 
 
 class WebApplication:

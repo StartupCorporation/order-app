@@ -1,20 +1,19 @@
 from typing import Annotated
 
-from faststream import Context
-from faststream.rabbit import RabbitRouter, RabbitQueue
 from dw_shared_kernel import (
     CommandBus,
     Container,
 )
+from faststream import Context
+from faststream.rabbit import RabbitQueue, RabbitRouter
 
 from interface.queue.config import config
-from interface.queue.routes.order.contracts.order_products_are_reserved import (
-    OrderProductsAreReservedEventInputContract,
-)
 from interface.queue.routes.order.contracts.failed_to_reserve_order_products import (
     FailedToReserveOrderProductsEventInputContract,
 )
-
+from interface.queue.routes.order.contracts.order_products_are_reserved import (
+    OrderProductsAreReservedEventInputContract,
+)
 
 router = RabbitRouter()
 

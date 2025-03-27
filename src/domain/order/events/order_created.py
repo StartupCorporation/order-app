@@ -3,7 +3,7 @@ from uuid import UUID
 
 from dw_shared_kernel import IntegrationEvent
 
-from domain.order.value_object.order_product import OrderedProduct
+from domain.order.value_object.ordered_product import OrderedProduct
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)

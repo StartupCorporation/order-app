@@ -1,9 +1,9 @@
 from dw_shared_kernel import CommandHandler
 
+from application.commands.ask_for_callback_request.command import AskForCallbackRequestCommand
 from domain.service.entity.callback_request import CallbackRequest
 from domain.service.repository.callback_request import CallbackRequestRepository
 from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
-from application.commands.ask_for_callback_request.command import AskForCallbackRequestCommand
 
 
 class AskForCallbackRequestCommandHandler(CommandHandler[AskForCallbackRequestCommand]):

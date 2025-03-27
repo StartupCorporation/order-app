@@ -22,6 +22,8 @@ from domain.order.exception.order_status_name_is_long import OrderStatusNameIsLo
 
 @dataclass(kw_only=True, slots=True)
 class OrderStatus(Entity):
+    __hash__ = Entity.__hash__
+
     code: str
     name: str
     description: str | None
