@@ -17,6 +17,23 @@ class SQLCallbackRequestRepository(AbstractSQLRepository, DomainModelRepositoryM
         super().__init__(*args, **kwargs)
         self._callback_request_entity_mapper = callback_request_entity_mapper
 
+    async def get_all(self) -> list[CallbackRequest]:
+        async with self._connection_manager.connect() as cur:
+            records = await cur.fetch(
+                """
+                SELECT
+                    id AS "callback_request.id",
+                    customer_note AS "callback_request.customer_note",
+                    message_customer AS "callback_request.message_customer",
+                    customer_info AS "callback_request.customer_info",
+                    created_at AS "callback_request.created_at"
+                FROM
+                    callback_request
+                """,
+            )
+
+        return [self._callback_request_entity_mapper.to_domain_model(data=record) for record in records]
+
     async def save(
         self,
         entity: CallbackRequest,

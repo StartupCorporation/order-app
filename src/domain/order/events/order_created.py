@@ -8,7 +8,7 @@ from domain.order.value_object.ordered_product import OrderedProduct
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OrderCreated(IntegrationEvent):
-    __event_name__ = "OrderCreated"
+    __event_name__ = "ORDER_CREATED"
 
     order_id: UUID
     products: list[OrderedProduct]

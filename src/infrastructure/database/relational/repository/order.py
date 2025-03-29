@@ -20,7 +20,26 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
         self._order_entity_mapper = order_entity_mapper
 
     async def get_all(self) -> list[Order]:
-        raise NotImplementedError()
+        async with self._connection_manager.connect() as cur:
+            records = await cur.fetch(
+                """
+                SELECT
+                    order_.id AS "order_.id",
+                    order_.comment AS "order_.comment",
+                    order_.message_customer AS "order_.message_customer",
+                    order_.created_at AS "order_.created_at",
+                    order_.customer_info AS "order_.customer_info",
+                    order_.products AS "order_.products",
+                    order_.order_status_id AS "order_.order_status_id",
+                    order_status.name AS "order_status.name",
+                    order_status.code AS "order_status.code",
+                    order_status.description AS "order_status.description"
+                FROM
+                    order_ JOIN order_status ON order_.order_status_id = order_status.id
+                """,
+            )
+
+        return [self._order_entity_mapper.to_domain_model(data=record) for record in records]
 
     async def get_by_id(
         self,

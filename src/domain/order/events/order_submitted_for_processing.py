@@ -6,7 +6,7 @@ from dw_shared_kernel import IntegrationEvent
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OrderSubmittedForProcessing(IntegrationEvent):
-    __event_name__ = "OrderSubmittedForProcessing"
+    __event_name__ = "ORDER_SUBMITTED_FOR_PROCESSING"
 
     order_id: UUID
 

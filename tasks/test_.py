@@ -15,7 +15,7 @@ def run_tests(
     """
     Runs tests.
     """
-    context.run("pytest src/", pty=True)
+    context.run("source ../infrastructure/.env.local.test && pytest src/", pty=True)
 
 
 collection = Collection(

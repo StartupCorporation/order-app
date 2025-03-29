@@ -20,9 +20,9 @@ class RabbitMQSettings(BaseSettings):
     @classmethod
     def transform_to_queue_config(
         cls,
-        value: str,
+        value: str | dict,
     ) -> dict:
-        return json.loads(value)
+        return json.loads(value) if isinstance(value, str) else value
 
     @property
     def connection_url(self) -> str:

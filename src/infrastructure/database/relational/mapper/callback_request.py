@@ -40,7 +40,9 @@ class CallbackRequestEntityMapper(DomainModelTableMapper[CallbackRequest, Record
         callback_request_entity = CallbackRequest(
             id=data["callback_request.id"],
             customer_note=(
-                None if data["callback_request.comment"] is None else Note(content=data["callback_request.comment"])
+                None
+                if not data["callback_request.customer_note"]
+                else Note(content=data["callback_request.customer_note"])
             ),
             customer_personal_info=CustomerPersonalInformation(
                 name=callback_request_customer_info_data["name"],

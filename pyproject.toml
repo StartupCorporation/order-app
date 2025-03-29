@@ -7,9 +7,11 @@ dependencies = []
 
 [project.optional-dependencies]
 tests = [
+    "httpx",
     "pytest",
     "pytest-xdist",
     "pytest-asyncio",
+    "jsonschema",
 ]
 local = [
     "ipython",
@@ -87,6 +89,7 @@ docstring-code-format = false
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
 testpaths = [
     "src/tests",
 ]
