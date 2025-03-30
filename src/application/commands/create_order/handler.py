@@ -2,8 +2,8 @@ from dw_shared_kernel import CommandHandler
 
 from application.commands.create_order.command import CreateOrderCommand
 from domain.order.service.order import OrderService
+from domain.order.value_object.ordered_product import OrderedProduct
 from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
-from domain.order.value_object.order_product import OrderedProduct
 
 
 class CreateOrderCommandHandler(CommandHandler[CreateOrderCommand]):

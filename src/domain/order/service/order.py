@@ -5,7 +5,7 @@ from domain.order.entity.order_status import BuiltInOrderStatus
 from domain.order.exception.order_status_not_found import OrderStatusNotFound
 from domain.order.repository.order import OrderRepository
 from domain.order.repository.order_status import OrderStatusRepository
-from domain.order.value_object.order_product import OrderedProduct
+from domain.order.value_object.ordered_product import OrderedProduct
 from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
 
 
@@ -25,7 +25,7 @@ class OrderService:
         customer_personal_information: CustomerPersonalInformation,
         ordered_products: list[OrderedProduct],
         message_customer: bool,
-        customer_note: str,
+        customer_note: str | None,
     ) -> None:
         order_status = await self._order_status_repository.get_by_code(code=BuiltInOrderStatus.NEW)
 
@@ -75,7 +75,7 @@ class OrderService:
 
         order.start_processing(order_status=order_status)
 
+        await self._order_repository.save(entity=order)
+
         for event in order.flush_events():
             await self._event_bus.publish(event=event)
-
-        await self._order_repository.save(entity=order)

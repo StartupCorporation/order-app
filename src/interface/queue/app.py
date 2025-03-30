@@ -1,14 +1,14 @@
 from typing import Iterable
 
-from faststream import FastStream, ContextRepo, ExceptionMiddleware
-from faststream.broker.router import BrokerRouter
-from faststream.rabbit import RabbitBroker
 from dw_shared_kernel import (
-    DomainException,
     Container,
+    DomainException,
     SharedKernelInfrastructureLayer,
     get_di_container,
 )
+from faststream import ContextRepo, ExceptionMiddleware, FastStream
+from faststream.broker.router import BrokerRouter
+from faststream.rabbit import RabbitBroker
 
 from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer

@@ -6,8 +6,14 @@ requires-python = ">=3.13"
 dependencies = []
 
 [project.optional-dependencies]
-local = [
+tests = [
+    "httpx",
     "pytest",
+    "pytest-xdist",
+    "pytest-asyncio",
+    "jsonschema",
+]
+local = [
     "ipython",
     "invoke",
     "ruff",
@@ -15,7 +21,7 @@ local = [
 ]
 web = [
     "pydantic-settings",
-    "dw-shared-kernel",
+    "dw-shared-kernel@git+ssh://git@github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
     "phonenumbers",
     "email-validator",
     "aio-pika",
@@ -30,7 +36,7 @@ migration = [
 ]
 queue = [
     "pydantic-settings",
-    "dw-shared-kernel",
+    "dw-shared-kernel@git+ssh://git@github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
     "phonenumbers",
     "email-validator",
     "aio-pika",
@@ -48,12 +54,15 @@ exclude = [
     "venv",
     ".git",
     "__pycache__",
+    ".pytest_cache",
+    "requirements",
 ]
 target-version = "py313"
 
 [tool.ruff.lint]
 ignore = ["N818"]
 select = [
+    "I",
     "F",
     "E",
     "W",
@@ -77,3 +86,13 @@ indent-style = "space"
 skip-magic-trailing-comma = false
 line-ending = "auto"
 docstring-code-format = false
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "function"
+asyncio_mode = "auto"
+testpaths = [
+    "src/tests",
+]
+pythonpath = [
+    "src",
+]

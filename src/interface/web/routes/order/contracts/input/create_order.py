@@ -1,5 +1,6 @@
 from typing import Annotated
 from uuid import uuid4
+
 from pydantic import UUID4, Field
 
 from application.commands.create_order.command import CreateOrderCommand, CustomerPersonalInfoInput, ProductInput
@@ -15,7 +16,7 @@ class CreateOrderInputContract(InputContract):
         ),
     ]
     customer_note: Annotated[
-        str,
+        str | None,
         Field(
             examples=["Text me in Telegram, please."],
             validation_alias="customerComment",

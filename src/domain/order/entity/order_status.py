@@ -20,8 +20,10 @@ from domain.order.exception.order_status_name_cant_be_empty import OrderStatusNa
 from domain.order.exception.order_status_name_is_long import OrderStatusNameIsLong
 
 
-@dataclass(kw_only=True, slots=True)
+@dataclass(kw_only=True, slots=True, eq=False)
 class OrderStatus(Entity):
+    __hash__ = Entity.__hash__
+
     code: str
     name: str
     description: str | None

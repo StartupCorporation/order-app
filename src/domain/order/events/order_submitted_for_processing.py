@@ -1,20 +1,25 @@
 from dataclasses import dataclass
-from uuid import UUID
 
 from dw_shared_kernel import IntegrationEvent
+
+from domain.order.value_object.ordered_product import OrderedProduct
 
 
 @dataclass(frozen=True, slots=True, kw_only=True)
 class OrderSubmittedForProcessing(IntegrationEvent):
-    __event_name__ = "OrderSubmittedForProcessing"
+    __event_name__ = "ORDER_SUBMITTED_FOR_PROCESSING"
 
-    order_id: UUID
+    products: list[OrderedProduct]
 
     def serialize(self) -> dict:
         serialized_event = super(OrderSubmittedForProcessing, self).serialize()
-        serialized_event["data"] = {
-            "order_id": self.order_id,
-        }
+        serialized_event["data"] = [
+            {
+                "product_id": product.product_id,
+                "quantity": product.quantity,
+            }
+            for product in self.products
+        ]
         return serialized_event
 
     @classmethod

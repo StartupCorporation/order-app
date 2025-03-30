@@ -1,11 +1,12 @@
 from typing import Annotated
+
 from pydantic import Field
 
-from interface.web.contracts import InputContract
 from application.commands.ask_for_callback_request.command import (
     AskForCallbackRequestCommand,
     CustomerPersonalInfoInput,
 )
+from interface.web.contracts import InputContract
 
 
 class AskForCallbackRequestInputContract(InputContract):
@@ -17,7 +18,7 @@ class AskForCallbackRequestInputContract(InputContract):
         ),
     ]
     customer_note: Annotated[
-        str,
+        str | None,
         Field(
             examples=["Text me in Telegram, please."],
             description="The customer's note for the order.",
