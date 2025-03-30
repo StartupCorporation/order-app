@@ -1,10 +1,11 @@
 import json
+from collections.abc import Awaitable, Callable
 from datetime import datetime
 from uuid import UUID, uuid4
 
 import jsonschema
 import pytest
-from aio_pika import Channel, IncomingMessage, Queue
+from aio_pika import IncomingMessage
 from dw_shared_kernel import Container
 from httpx import AsyncClient
 
@@ -24,8 +25,7 @@ async def test_create_order_endpoint_works_correctly_without_mock(
     customer_note: str,
     api_client: AsyncClient,
     di_container: Container,
-    rabbitmq_connection: Channel,
-    order_created_event_schema: dict[str, dict | str],
+    get_messages_from_queue: Callable[[str], Awaitable[list[IncomingMessage]]],
     purge_rabbitmq_queues: None,  # noqa: ARG001
     clean_db: None,  # noqa: ARG001
 ) -> None:
@@ -73,20 +73,34 @@ async def test_create_order_endpoint_works_correctly_without_mock(
     assert orders[0].ordered_products[0].product_id == UUID(request_data["products"][0]["productId"])
     assert orders[0].ordered_products[0].quantity == request_data["products"][0]["quantity"]
 
-    rabbitmq_settings = di_container[RabbitMQSettings]
-    queue: Queue = await rabbitmq_connection.get_queue(rabbitmq_settings.CATALOG_RESERVATION_QUEUE.NAME)  # type: ignore
-
-    messages: list[IncomingMessage] = []
-    while True:
-        message = await queue.get(
-            no_ack=True,
-            fail=False,
-        )
-        if not message:
-            break
-        messages.append(message)
+    messages = await get_messages_from_queue(di_container[RabbitMQSettings].CATALOG_RESERVATION_QUEUE.NAME)
 
     assert len(messages) == 1
+
+    order_created_event_schema = {
+        "type": "object",
+        "properties": {
+            "id": {"type": "string"},
+            "event_type": {"type": "string"},
+            "created_at": {"type": "string"},
+            "data": {
+                "type": "object",
+                "properties": {
+                    "order_id": {"type": "string"},
+                    "products": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "product_id": {"type": "string"},
+                                "quantity": {"type": "integer"},
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    }
 
     event = json.loads(messages[0].body)
     try:

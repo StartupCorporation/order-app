@@ -153,4 +153,4 @@ async def test_start_order_processing_stores_order_and_publishes_events(
     assert len(orders) == 1
     assert orders[0].status.is_processing
     assert isinstance(submited_event, OrderSubmittedForProcessing)
-    assert submited_event.order_id == order_entity.id
+    assert submited_event.products == order_entity.ordered_products

@@ -1,8 +1,8 @@
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable, Callable
 
 import pytest
 import pytest_asyncio
-from aio_pika import Channel
+from aio_pika import Channel, IncomingMessage, Queue
 from aio_pika.abc import AbstractChannel
 from asyncpg import Connection
 from dw_shared_kernel import Container, SharedKernelInfrastructureLayer, get_di_container
@@ -57,3 +57,23 @@ def di_container() -> Container:
             ApplicationLayer(),
         ),
     )
+
+
+@pytest.fixture
+def get_messages_from_queue(rabbitmq_connection: Channel) -> Callable[[str], Awaitable[list[IncomingMessage]]]:
+    async def function(queue_name: str) -> list[IncomingMessage]:
+        queue: Queue = await rabbitmq_connection.get_queue(queue_name)  # type: ignore
+
+        messages: list[IncomingMessage] = []
+        while True:
+            message = await queue.get(
+                no_ack=True,
+                fail=False,
+            )
+            if not message:
+                break
+            messages.append(message)
+
+        return messages
+
+    return function

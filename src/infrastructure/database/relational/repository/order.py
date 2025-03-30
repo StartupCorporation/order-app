@@ -1,7 +1,5 @@
 from uuid import UUID
 
-import asyncpg
-
 from domain.order.entity.order import Order
 from domain.order.repository.order import OrderRepository
 from infrastructure.database.relational.mapper.order import OrderEntityMapper
@@ -89,21 +87,18 @@ class SQLOrderRepository(AbstractSQLRepository, DomainModelRepositoryMixin, Orde
         )
 
         async with self._connection_manager.connect() as cur:
-            try:
-                await cur.execute(
-                    f"""
+            await cur.execute(
+                f"""
                     INSERT INTO order_ ({", ".join(insert_order_values.keys())})
                     VALUES ({insert_placeholders})
                     ON CONFLICT (id) DO UPDATE
                     SET {
-                        ",\n".join(
-                            f"{col} = {placeholder}"
-                            for col, placeholder in zip(update_order_values.keys(), update_placeholders)
-                        )
-                    }
+                    ",\n".join(
+                        f"{col} = {placeholder}"
+                        for col, placeholder in zip(update_order_values.keys(), update_placeholders)
+                    )
+                }
                     """,
-                    *insert_order_values.values(),
-                    *update_order_values.values(),
-                )
-            except asyncpg.PostgresError as e:
-                raise e
+                *insert_order_values.values(),
+                *update_order_values.values(),
+            )

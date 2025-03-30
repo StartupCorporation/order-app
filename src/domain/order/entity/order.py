@@ -83,7 +83,7 @@ class Order(Entity, EventMixin):
 
         self._add_event(
             event=OrderSubmittedForProcessing(
-                order_id=self.id,
+                products=self.ordered_products,
             ),
         )
 

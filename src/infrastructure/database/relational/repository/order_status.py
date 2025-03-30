@@ -19,7 +19,33 @@ class SQLOrderStatusRepository(AbstractSQLRepository, DomainModelRepositoryMixin
         self,
         entity: OrderStatus,
     ) -> None:
-        raise NotImplementedError()
+        insert_values = self._order_status_mapper.from_domain_model(model=entity)
+        update_values = {key: value for key, value in insert_values.items() if key != "id"}
+
+        insert_placeholders = self._get_inline_placeholders_string(
+            amount=len(insert_values),
+            start_position=1,
+        )
+        update_placeholders = self._get_placeholders_tuple(
+            amount=len(update_values),
+            start_position=len(insert_values) + 1,
+        )
+
+        async with self._connection_manager.connect() as cur:
+            await cur.execute(
+                f"""
+                    INSERT INTO order_status ({", ".join(insert_values.keys())})
+                    VALUES ({insert_placeholders})
+                    ON CONFLICT (id) DO UPDATE
+                    SET {
+                    ",\n".join(
+                        f"{col} = {placeholder}" for col, placeholder in zip(update_values.keys(), update_placeholders)
+                    )
+                }
+                    """,
+                *insert_values.values(),
+                *update_values.values(),
+            )
 
     async def get_by_code(
         self,

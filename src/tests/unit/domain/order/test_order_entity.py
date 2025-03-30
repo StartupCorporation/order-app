@@ -115,7 +115,7 @@ def test_order_can_start_processing_if_products_are_reserved(
 
     assert len(events) == 1
     assert isinstance(events[0], OrderSubmittedForProcessing)
-    assert events[0].order_id == order_entity.id
+    assert events[0].products == order_entity.ordered_products
 
 
 @pytest.mark.parametrize(
