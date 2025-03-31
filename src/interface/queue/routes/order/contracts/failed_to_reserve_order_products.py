@@ -7,6 +7,7 @@ from application.commands.mark_order_as_failed_for_products_reservation.command 
 )
 from interface.queue.contracts import MessageBrokerEvent
 
+
 type FailedToReserveOrderProductsEventInputContract = MessageBrokerEvent[
     Literal["FAILED_TO_RESERVE_PRODUCTS"],
     FailedToReserveOrderProducts,

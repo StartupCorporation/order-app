@@ -1,8 +1,7 @@
+from dw_python_clis import change_to_root_dir
 from invoke.collection import Collection
 from invoke.context import Context
 from invoke.tasks import task
-
-from tasks.shared import change_to_root_dir
 
 
 @task(
@@ -15,8 +14,7 @@ def create_new_migration(
     """
     Creates a new migration file.
     """
-    context.run("cd src/infrastructure/database/relational/migrations && yoyo new")
-    context.run("rm -rf src/infrastructure/database/relational/migrations/__pycache__")
+    context.run("export PYTHONDONTWRITEBYTECODE=1 && cd src/infrastructure/database/relational/migrations && yoyo new")
 
 
 collection = Collection(

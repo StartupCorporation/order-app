@@ -9,6 +9,7 @@ from fastapi import APIRouter, Body, Depends, status
 from interface.web.dependencies.container import get_di_container
 from interface.web.routes.order.contracts.input.create_order import CreateOrderInputContract
 
+
 router = APIRouter(
     prefix="/order",
     tags=["Order"],

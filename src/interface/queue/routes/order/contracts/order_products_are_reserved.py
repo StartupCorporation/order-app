@@ -5,6 +5,7 @@ from pydantic import UUID4, BaseModel
 from application.commands.start_order_processing.command import StartOrderProcessingCommand
 from interface.queue.contracts import MessageBrokerEvent
 
+
 type OrderProductsAreReservedEventInputContract = MessageBrokerEvent[
     Literal["PRODUCTS_RESERVED_FOR_ORDER"],
     OrderProductsAreReserved,

@@ -15,6 +15,7 @@ from interface.queue.routes.order.contracts.order_products_are_reserved import (
     OrderProductsAreReservedEventInputContract,
 )
 
+
 router = RabbitRouter()
 
 

@@ -11,6 +11,7 @@ from interface.web.routes.callback_request.contracts.input.ask_for_callback_requ
     AskForCallbackRequestInputContract,
 )
 
+
 router = APIRouter(
     prefix="/callback_request",
     tags=["Callback Request"],
