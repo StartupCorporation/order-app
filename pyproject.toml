@@ -21,7 +21,7 @@ local = [
 ]
 web = [
     "pydantic-settings",
-    "dw-shared-kernel@git+ssh://git@github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
+    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
     "phonenumbers",
     "email-validator",
     "aio-pika",
@@ -36,7 +36,7 @@ migration = [
 ]
 queue = [
     "pydantic-settings",
-    "dw-shared-kernel@git+ssh://git@github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
+    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
     "phonenumbers",
     "email-validator",
     "aio-pika",
