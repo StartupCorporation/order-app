@@ -3,3 +3,7 @@ __pycache__/
 venv/
 src/comment_app.egg-info/
 .pytest_cache/
+tests_report/
+
+.DS_Store
+.coverage

@@ -9,8 +9,8 @@ dependencies = []
 tests = [
     "httpx",
     "pytest",
-    "pytest-xdist",
     "pytest-asyncio",
+    "pytest-cov",
     "jsonschema",
 ]
 local = [
@@ -90,9 +90,16 @@ docstring-code-format = false
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
 asyncio_mode = "auto"
+addopts = "--cov=src --cov-report html:tests_report --no-cov-on-fail"
 testpaths = [
     "src/tests",
 ]
 pythonpath = [
     "src",
+]
+
+[tool.coverage.run]
+omit = [
+    "src/tests/*",
+    "*__init__.py"
 ]
