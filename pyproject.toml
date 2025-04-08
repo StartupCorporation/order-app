@@ -90,7 +90,7 @@ docstring-code-format = false
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "function"
 asyncio_mode = "auto"
-addopts = "--cov=src --cov-report html:tests_report --no-cov-on-fail"
+addopts = "--cov=src --cov-report html:tests_report --cov-report term:skip-covered --no-cov-on-fail -x"
 testpaths = [
     "src/tests",
 ]
@@ -101,5 +101,13 @@ pythonpath = [
 [tool.coverage.run]
 omit = [
     "src/tests/*",
-    "*__init__.py"
+    "*__init__.py",
+    "src/infrastructure/database/relational/migrations/*",
+    "src/interface/web/routes/**/docs/*",
+    "*/layer.py",
+    "src/interface/web/app.py",
+    "src/interface/queue/app.py",
+    "src/interface/**/contracts.py",
+    "src/interface/**/contracts/*",
+    "src/interface/queue/config.py",
 ]
