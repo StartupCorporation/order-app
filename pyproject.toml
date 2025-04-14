@@ -21,6 +21,7 @@ local = [
     "dw-python-clis@git+https://github.com/StartupCorporation/dw-python-clis.git",
 ]
 web = [
+    "psutil",
     "pydantic-settings",
     "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.4.1",
     "phonenumbers",
@@ -30,6 +31,7 @@ web = [
     "asyncpg",
     "fastapi",
     "uvicorn",
+    "prometheus-client",
 ]
 migration = [
     "psycopg2-binary",

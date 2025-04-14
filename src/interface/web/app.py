@@ -1,18 +1,25 @@
-from typing import Awaitable, Callable, Iterable
+import asyncio
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+from typing import Iterable
 
+import psutil
 from dw_shared_kernel import (
     Container,
-    DomainException,
     SharedKernelInfrastructureLayer,
     get_di_container,
 )
-from fastapi import APIRouter, FastAPI, Request, status
+from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from prometheus_client.asgi import make_asgi_app
 
 from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
+from infrastructure.monitoring.metrics import system_usage
 from infrastructure.settings.application import ApplicationSettings
+from interface.web.middlewares.container import DIContainerProviderMiddleware
+from interface.web.middlewares.exception import ExceptionHandlerMiddleware
+from interface.web.middlewares.metrics import PrometheusMetricsMiddleware
 from interface.web.routes.callback_request.endpoints import router as callback_request_router
 from interface.web.routes.order.endpoints import router as order_router
 
@@ -28,6 +35,9 @@ class WebApplication:
             routes=routes,
         )
 
+        self._mount_metrics_endpoint()
+        self._set_middlewares()
+
     def _create_application(
         self,
         routes: Iterable[APIRouter],
@@ -40,50 +50,49 @@ class WebApplication:
             version=settings.VERSION,
             description=f"**{settings.TITLE}** OpenAPI documentation.",
             docs_url="/docs" if settings.DEBUG else None,
+            lifespan=self._app_lifespan,
         )
 
         for route in routes:
             app.include_router(route)
 
-        @app.middleware("http")
-        async def set_registry[T](
-            request: Request,
-            call_next: Callable[[Request], Awaitable[T]],
-        ) -> T:
-            request.state.container = self._container
-            return await call_next(request)
+        return app
 
-        @app.middleware("http")
-        async def exception_handling_middleware(request: Request, call_next):
-            try:
-                return await call_next(request)
-            except Exception as e:
-                return self._exception_factory(exception=e)
+    def _mount_metrics_endpoint(self) -> None:
+        self._app.mount("/metrics/", make_asgi_app())
 
-        app.add_middleware(
-            CORSMiddleware,  # type: ignore
+    def _set_middlewares(self) -> None:
+        self._app.add_middleware(
+            DIContainerProviderMiddleware,  # type: ignore
+            container=self._container,  # type: ignore
+        )
+        self._app.add_middleware(
+            ExceptionHandlerMiddleware,  # type: ignore
+            container=self._container,  # type: ignore
+        )
+        self._app.add_middleware(
+            CORSMiddleware,
             allow_origins=["*"],
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
+        self._app.add_middleware(PrometheusMetricsMiddleware)
 
-        return app
+    @staticmethod
+    @asynccontextmanager
+    async def _app_lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG004
+        async def _collect_system_usage_metrics() -> None:
+            process = psutil.Process()
+            process.cpu_percent()
 
-    def _exception_factory(self, exception: Exception) -> JSONResponse:
-        match exception:
-            case DomainException():
-                return JSONResponse(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    content={"detail": str(exception)},
-                )
-            case Exception() if self._container[ApplicationSettings].DEBUG:
-                raise exception
-            case Exception():
-                return JSONResponse(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    content={"detail": "Something went wrong..."},
-                )
+            while True:
+                system_usage.labels("CPU").set(process.cpu_percent())
+                system_usage.labels("Memory").set(process.memory_info().rss)
+                await asyncio.sleep(15)
+
+        asyncio.create_task(_collect_system_usage_metrics())
+        yield
 
     def __call__(self):
         return self._app
