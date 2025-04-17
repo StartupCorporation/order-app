@@ -14,7 +14,9 @@ idna==3.10
 multidict==6.1.0
 pamqp==3.3.0
 phonenumbers==9.0.0
+prometheus-client==0.21.1
 propcache==0.3.0
+psutil==7.0.0
 pydantic==2.10.6
 pydantic-core==2.27.2
 pydantic-settings==2.8.1
