@@ -5,7 +5,7 @@ import pytest_asyncio
 from aio_pika import Channel, IncomingMessage, Queue
 from aio_pika.abc import AbstractChannel
 from asyncpg import Connection
-from dw_shared_kernel import Container, SharedKernelInfrastructureLayer, get_di_container
+from dw_shared_kernel import Container, SharedKernelInfrastructureLayer, get_initialized_di_container
 
 from application.layer import ApplicationLayer
 from infrastructure.database.relational.connection import SQLConnectionManager
@@ -50,7 +50,7 @@ async def rabbitmq_connection(di_container: Container) -> AsyncIterator[Abstract
 
 @pytest.fixture(scope="session")
 def di_container() -> Container:
-    return get_di_container(
+    return get_initialized_di_container(
         layers=(
             SharedKernelInfrastructureLayer(),
             InfrastructureLayer(),

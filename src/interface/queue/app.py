@@ -4,7 +4,7 @@ from dw_shared_kernel import (
     Container,
     DomainException,
     SharedKernelInfrastructureLayer,
-    get_di_container,
+    get_initialized_di_container,
 )
 from faststream import ContextRepo, ExceptionMiddleware, FastStream
 from faststream.broker.router import BrokerRouter
@@ -70,7 +70,7 @@ class QueueApplication:
 
 
 queue_app = QueueApplication(
-    container=get_di_container(
+    container=get_initialized_di_container(
         layers=(
             SharedKernelInfrastructureLayer(),
             InfrastructureLayer(),
