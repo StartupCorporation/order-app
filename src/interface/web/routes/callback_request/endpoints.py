@@ -3,10 +3,10 @@ from typing import Annotated
 from dw_shared_kernel import (
     CommandBus,
     Container,
+    get_di_container,
 )
 from fastapi import APIRouter, Body, Depends, status
 
-from interface.web.dependencies.container import get_di_container
 from interface.web.routes.callback_request.contracts.input.ask_for_callback_request import (
     AskForCallbackRequestInputContract,
 )

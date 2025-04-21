@@ -2,6 +2,8 @@ from dw_shared_kernel import CommandBus, Container, Layer
 
 from application.commands.ask_for_callback_request.command import AskForCallbackRequestCommand
 from application.commands.ask_for_callback_request.handler import AskForCallbackRequestCommandHandler
+from application.commands.complete_order.command import CompleteOrderCommand
+from application.commands.complete_order.handler import CompleteOrderCommandHandler
 from application.commands.create_order.command import CreateOrderCommand
 from application.commands.create_order.handler import CreateOrderCommandHandler
 from application.commands.mark_order_as_failed_for_products_reservation.command import (
@@ -43,5 +45,12 @@ class ApplicationLayer(Layer):
             command=AskForCallbackRequestCommand,
             handler=AskForCallbackRequestCommandHandler(
                 callback_request_repository=container[CallbackRequestRepository],
+            ),
+        )
+        container[CommandBus].register(
+            command=CompleteOrderCommand,
+            handler=CompleteOrderCommandHandler(
+                order_repository=container[OrderRepository],
+                order_service=container[OrderService],
             ),
         )

@@ -13,6 +13,7 @@ from domain.order.events.order_submitted_for_processing import OrderSubmittedFor
 from domain.order.exception.invalid_order_status import InvalidOrderStatus
 from domain.order.exception.not_new_order_cant_fail_products_reservation import NotNewOrderCantFailProductsReservation
 from domain.order.exception.only_new_order_can_be_marked_as_processing import OnlyNewOrderCanBeMarkedAsProcessing
+from domain.order.exception.only_processing_order_can_be_completed import OnlyProcessingOrderCanBeCompleted
 from domain.order.exception.order_cant_contain_no_products import OrderCantContainNoProducts
 from domain.order.value_object.ordered_product import OrderedProduct
 from domain.service.value_object.customer_personal_info import CustomerPersonalInformation
@@ -98,6 +99,20 @@ class Order(Entity, EventMixin):
             raise InvalidOrderStatus(
                 f"You have to provide {BuiltInOrderStatus.PRODUCTS_RESERVATION_FAILED} "
                 "status for failed products reservation.",
+            )
+
+        self.set_status(order_status=order_status)
+
+    def complete(
+        self,
+        order_status: OrderStatus,
+    ) -> None:
+        if not self.status.is_processing:
+            raise OnlyProcessingOrderCanBeCompleted()
+
+        if not order_status.is_completed:
+            raise InvalidOrderStatus(
+                f"You have to provide {BuiltInOrderStatus.COMPLETED} status to complete order.",
             )
 
         self.set_status(order_status=order_status)

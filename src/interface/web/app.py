@@ -6,8 +6,10 @@ from typing import Iterable
 import psutil
 from dw_shared_kernel import (
     Container,
+    DIContainerProviderMiddleware,
+    ExceptionHandlerMiddleware,
     SharedKernelInfrastructureLayer,
-    get_di_container,
+    get_initialized_di_container,
 )
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,8 +19,6 @@ from application.layer import ApplicationLayer
 from infrastructure.layer import InfrastructureLayer
 from infrastructure.monitoring.metrics import system_usage
 from infrastructure.settings.application import ApplicationSettings
-from interface.web.middlewares.container import DIContainerProviderMiddleware
-from interface.web.middlewares.exception import ExceptionHandlerMiddleware
 from interface.web.middlewares.metrics import PrometheusMetricsMiddleware
 from interface.web.routes.callback_request.endpoints import router as callback_request_router
 from interface.web.routes.order.endpoints import router as order_router
@@ -63,13 +63,10 @@ class WebApplication:
 
     def _set_middlewares(self) -> None:
         self._app.add_middleware(
-            DIContainerProviderMiddleware,  # type: ignore
-            container=self._container,  # type: ignore
+            DIContainerProviderMiddleware,
+            container=self._container,
         )
-        self._app.add_middleware(
-            ExceptionHandlerMiddleware,  # type: ignore
-            container=self._container,  # type: ignore
-        )
+        self._app.add_middleware(ExceptionHandlerMiddleware)
         self._app.add_middleware(
             CORSMiddleware,
             allow_origins=["*"],
@@ -99,7 +96,7 @@ class WebApplication:
 
 
 web_app = WebApplication(
-    container=get_di_container(
+    container=get_initialized_di_container(
         layers=(
             SharedKernelInfrastructureLayer(),
             InfrastructureLayer(),

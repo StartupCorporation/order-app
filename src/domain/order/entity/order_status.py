@@ -90,6 +90,10 @@ class OrderStatus(Entity):
     def is_products_reservation_failed(self) -> bool:
         return self.code == BuiltInOrderStatus.PRODUCTS_RESERVATION_FAILED.name
 
+    @property
+    def is_completed(self) -> bool:
+        return self.code == BuiltInOrderStatus.COMPLETED.name
+
 
 class BuiltInOrderStatus(ValueNameEnum):
     NEW = auto()

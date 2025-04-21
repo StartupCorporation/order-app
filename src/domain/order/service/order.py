@@ -79,3 +79,16 @@ class OrderService:
 
         for event in order.flush_events():
             await self._event_bus.publish(event=event)
+
+    async def complete_order(
+        self,
+        order: Order,
+    ) -> None:
+        order_status = await self._order_status_repository.get_by_code(code=BuiltInOrderStatus.COMPLETED)
+
+        if not order_status:
+            raise OrderStatusNotFound(f"Unable to find '{BuiltInOrderStatus.COMPLETED}' order status.")
+
+        order.complete(order_status=order_status)
+
+        await self._order_repository.save(entity=order)
