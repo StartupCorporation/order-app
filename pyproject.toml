@@ -32,6 +32,9 @@ web = [
     "fastapi",
     "uvicorn",
     "prometheus-client",
+    "aiosmtplib",
+    "jinja2",
+    "httpx",
 ]
 migration = [
     "psycopg2-binary",
@@ -46,6 +49,9 @@ queue = [
     "pydantic",
     "asyncpg",
     "faststream[rabbit,cli]",
+    "aiosmtplib",
+    "jinja2",
+    "httpx",
 ]
 
 [tool.ruff]

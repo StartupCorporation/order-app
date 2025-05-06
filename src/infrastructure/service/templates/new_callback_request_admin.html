@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Запит на зворотній звʼязок</title>
+  <style>
+    html {
+      background: #E5E5E5;
+      min-height: 100%;
+    }
+
+    @media only screen and (max-width: 666px) {
+      .small-float-center {
+        float: none !important;
+        margin: 0 auto !important;
+        text-align: center !important;
+      }
+
+      table.body table.container .show-for-large {
+        display: none !important;
+        mso-hide: all;
+        overflow: hidden;
+        width: 0;
+      }
+
+      table.body table.container .hide-for-large {
+        display: inline-block !important;
+      }
+
+      table.body img {
+        height: auto;
+        width: auto;
+      }
+
+      table.body center {
+        min-width: 0 !important;
+      }
+
+      table.body .container {
+        width: 100% !important;
+      }
+
+      table.body .columns {
+        box-sizing: border-box;
+        height: auto !important;
+      }
+
+      .large-offset-1 {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+
+      th.small-12 {
+        display: inline-block !important;
+        width: 100% !important;
+      }
+
+      table.menu {
+        width: 100% !important;
+      }
+
+      table.menu td,
+      table.menu th {
+        display: inline-block !important;
+        width: auto !important;
+        text-align: center;
+      }
+
+      .pad-bt {
+        padding-bottom: 16px !important;
+      }
+
+      .text-title {
+        font-size: 21px !important;
+        line-height: 24px !important;
+      }
+
+      .text-description {
+        font-size: 15px !important;
+        text-align: left !important;
+      }
+
+      .subscribes {
+        width: 100% !important;
+      }
+
+      .goods-price {
+        width: auto !important;
+        display: inline-block !important;
+      }
+
+      .goods-description {
+        padding-left: 0 !important;
+        padding-top: 16px !important;
+      }
+
+      .price-inner {
+        width: 100% !important;
+      }
+
+      .picture-feedback {
+        max-width: 64px !important;
+        max-height: 64px !important;
+      }
+
+      .title-feedback {
+        font-size: 17px !important;
+      }
+
+      .small-text-center {
+        text-align: center !important;
+      }
+
+      .small-text-right {
+        text-align: right !important;
+      }
+
+      .small-text-left {
+        text-align: left !important;
+      }
+
+      .promocode {
+        font-size: 20px !important;
+        line-height: 36px !important;
+      }
+
+      .picture-look {
+        width: 32px !important;
+      }
+
+      th.small-12.promotion {
+        width: 288px !important;
+        display: block !important;
+      }
+
+      th.price-block {
+        display: table-cell !important;
+      }
+    }
+  </style>
+</head>
+
+<body style="margin:0;padding:0;width:100%!important;background:#E5E5E5;">
+  <table class="body" style="width:100%;height:100%;background:#E5E5E5;font-family:Arial, Helvetica, sans-serif;">
+    <tr>
+      <td align="center">
+        <center style="min-width:650px;width:100%">
+
+          <!-- Container -->
+          <table class="container" style="width:650px;margin:0 auto;background:#fff;">
+            <tr>
+              <td>
+
+                <!-- Spacer -->
+                <div style="height:16px;"></div>
+
+                <!-- Title -->
+                <div style="padding:0 16px;">
+                  <span class="text-title" style="display:block;font-size:24px;line-height:28px;font-weight:400;">
+                    Запит на зворотній звʼязок
+                  </span>
+                </div>
+
+                <!-- Spacer -->
+                <div style="height:16px;"></div>
+
+                <!-- Info Block -->
+                <div style="padding:0 16px;">
+                  <table style="width:100%;border:1px solid #eaeaea;border-radius:8px;border-collapse:collapse;font-family:Arial, sans-serif;">
+
+                    <!-- Row Template -->
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Ім'я:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.customer_personal_info.name }}</td>
+                    </tr>
+
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Телефон:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.customer_personal_info.phone_number }}</td>
+                    </tr>
+
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Пошта:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.customer_personal_info.email }}</td>
+                    </tr>
+
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Звʼязатись у Viber чи Telegram:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ 'Так' if callback_request.message_customer else 'Ні' }}</td>
+                    </tr>
+
+                    <tr style="border-bottom:1px solid #eaeaea;">
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Час заявки:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.time_info.created_at }}</td>
+                    </tr>
+
+                    <tr>
+                      <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Коментар:</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.customer_note.content if callback_request.customer_note else '' }}</td>
+                    </tr>
+                  </table>
+                </div>
+
+                <!-- Footer -->
+                <table class="container" style="margin-top:16px;width:650px;background:#f7f7f7;border-top:1px solid #eaeaea;">
+                  <tr>
+                    <td style="padding:16px;text-align:center;">
+                      <span style="color:#999;font-size:12px;">Це автоматичне повідомлення. Не відповідайте на нього.</span>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+          </table>
+
+        </center>
+      </td>
+    </tr>
+  </table>
+</body>
+
+</html>

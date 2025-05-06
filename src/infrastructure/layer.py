@@ -1,13 +1,27 @@
-from dw_shared_kernel import CommandBus, Container, EventBus, IntegrationEventRepository, Layer, MessageBrokerPublisher
+from dw_shared_kernel import (
+    CommandBus,
+    Container,
+    EventBus,
+    IntegrationEventRepository,
+    Layer,
+    LifecycleComponentRepository,
+    MessageBrokerPublisher,
+)
 
 from domain.order.events.order_created import OrderCreated
 from domain.order.events.order_submitted_for_processing import OrderSubmittedForProcessing
 from domain.order.repository.order import OrderRepository
 from domain.order.repository.order_status import OrderStatusRepository
+from domain.order.service.mail import OrderMailService
 from domain.order.service.order import OrderService
 from domain.service.repository.callback_request import CallbackRequestRepository
+from domain.service.service.mail import ServiceMailService
 from infrastructure.bus.middleware.event_dispatcher import ModelEventDispatcherMiddleware
 from infrastructure.bus.middleware.transaction import TransactionMiddleware
+from infrastructure.clients.catalog.client import CatalogClient
+from infrastructure.clients.http_ import HTTPClient
+from infrastructure.clients.iac.client import IACClient
+from infrastructure.clients.smtp import SMTPClient
 from infrastructure.database.base.transaction import DatabaseTransactionManager
 from infrastructure.database.relational.connection import SQLConnectionManager
 from infrastructure.database.relational.mapper.callback_request import CallbackRequestEntityMapper
@@ -20,12 +34,17 @@ from infrastructure.database.relational.transaction import SQLTransactionManager
 from infrastructure.message_broker.rabbitmq.connection import RabbitMQConnectionManager
 from infrastructure.message_broker.rabbitmq.destination import RabbitMQEventDestination
 from infrastructure.message_broker.rabbitmq.publisher import RabbitMQPublisher
+from infrastructure.service.mail import SMTPMailService
 from infrastructure.settings.application import ApplicationSettings
+from infrastructure.settings.catalog import CatalogServiceSettings
 from infrastructure.settings.database import DatabaseSettings
+from infrastructure.settings.iac import IACSettings
 from infrastructure.settings.rabbitmq import RabbitMQSettings
+from infrastructure.settings.smtp import SMTPSettings
 
 
 class InfrastructureLayer(Layer):
+
     def setup(
         self,
         container: Container,
@@ -33,6 +52,9 @@ class InfrastructureLayer(Layer):
         container[ApplicationSettings] = ApplicationSettings()  # type: ignore
         container[DatabaseSettings] = DatabaseSettings()  # type: ignore
         container[RabbitMQSettings] = RabbitMQSettings()  # type: ignore
+        container[SMTPSettings] = SMTPSettings()  # type: ignore
+        container[IACSettings] = IACSettings()  # type: ignore
+        container[CatalogServiceSettings] = CatalogServiceSettings()  # type: ignore
 
         container[RabbitMQConnectionManager] = RabbitMQConnectionManager(
             settings=container[RabbitMQSettings],
@@ -52,6 +74,20 @@ class InfrastructureLayer(Layer):
         container[ModelEventDispatcherMiddleware] = ModelEventDispatcherMiddleware(
             integration_event_repository=container[IntegrationEventRepository],
             message_broker_publisher=container[MessageBrokerPublisher],
+        )
+
+        container[SMTPClient] = SMTPClient(
+            smtp_settings=container[SMTPSettings],
+        )
+        container[HTTPClient] = HTTPClient()
+
+        container[IACClient] = IACClient(
+            http_client=container[HTTPClient],
+            iac_settings=container[IACSettings],
+        )
+        container[CatalogClient] = CatalogClient(
+            http_client=container[HTTPClient],
+            catalog_settings=container[CatalogServiceSettings],
         )
 
         container[CommandBus].add_middlewares(
@@ -87,6 +123,11 @@ class InfrastructureLayer(Layer):
             order_status_repository=container[OrderStatusRepository],
             order_repository=container[OrderRepository],
         )
+        container[OrderMailService] = container[ServiceMailService] = SMTPMailService(
+            smtp_client=container[SMTPClient],
+            iac_client=container[IACClient],
+            catalog_client=container[CatalogClient],
+        )
 
         container[IntegrationEventRepository].add_event_destination(
             event=OrderCreated,
@@ -101,4 +142,8 @@ class InfrastructureLayer(Layer):
                 routing_key=container[RabbitMQSettings].CATALOG_RESERVATION_QUEUE.NAME,
                 exchange=container[RabbitMQSettings].CATALOG_RESERVATION_QUEUE.EXCHANGE,
             ),
+        )
+
+        container[LifecycleComponentRepository].add(
+            component=container[HTTPClient],
         )
