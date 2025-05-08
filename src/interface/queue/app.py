@@ -1,12 +1,14 @@
-from typing import Iterable
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Iterable
 
 from dw_shared_kernel import (
     Container,
     DomainException,
+    LifecycleComponentManager,
     SharedKernelInfrastructureLayer,
     get_initialized_di_container,
 )
-from faststream import ContextRepo, ExceptionMiddleware, FastStream
+from faststream import ExceptionMiddleware, FastStream
 from faststream.broker.router import BrokerRouter
 from faststream.rabbit import RabbitBroker
 
@@ -18,6 +20,7 @@ from interface.queue.routes.order.endpoints import router as order_router
 
 
 class QueueApplication:
+
     def __init__(
         self,
         container: Container,
@@ -49,16 +52,20 @@ class QueueApplication:
             title=settings.TITLE,
             version=settings.VERSION,
             description=f"**{settings.TITLE}** AsyncAPI documentation.",
+            lifespan=self._app_lifespan,
         )
 
         for route in routes:
             broker.include_router(route)
 
-        @app.on_startup
-        def set_container_context(context: ContextRepo):
-            context.set_global("container", self._container)
-
         return app
+
+    @asynccontextmanager
+    async def _app_lifespan(self, *args, **kwargs) -> AsyncGenerator[None]:  # noqa: ARG002
+        self._app.context.set_global("container", self._container)
+
+        async with self._container[LifecycleComponentManager].start():
+            yield
 
     @staticmethod
     def _domain_exception_handler(exc: DomainException) -> None:

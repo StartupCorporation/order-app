@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from pydantic import Field
+from pydantic import AfterValidator, Field
 
 from application.commands.ask_for_callback_request.command import (
     AskForCallbackRequestCommand,
@@ -23,6 +23,7 @@ class AskForCallbackRequestInputContract(InputContract):
             examples=["Text me in Telegram, please."],
             description="The customer's note for the order.",
         ),
+        AfterValidator(lambda v: None if not v else v),
     ]
     personal_information: Annotated[
         "CustomerPersonalInformationInputContract",

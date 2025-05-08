@@ -26,7 +26,7 @@ class OrderService:
         ordered_products: list[OrderedProduct],
         message_customer: bool,
         customer_note: str | None,
-    ) -> None:
+    ) -> Order:
         order_status = await self._order_status_repository.get_by_code(code=BuiltInOrderStatus.NEW)
 
         if not order_status:
@@ -46,6 +46,8 @@ class OrderService:
 
         for event in new_order.flush_events():
             await self._event_bus.publish(event=event)
+
+        return new_order
 
     async def mark_order_as_failed_for_products_reservation(
         self,

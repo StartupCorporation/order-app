@@ -1,7 +1,7 @@
 from typing import Annotated
 from uuid import uuid4
 
-from pydantic import UUID4, Field
+from pydantic import UUID4, AfterValidator, Field
 
 from application.commands.create_order.command import CreateOrderCommand, CustomerPersonalInfoInput, ProductInput
 from interface.web.contracts import InputContract
@@ -22,6 +22,7 @@ class CreateOrderInputContract(InputContract):
             validation_alias="customerComment",
             description="The customer's note for the order.",
         ),
+        AfterValidator(lambda v: None if not v else v),
     ]
     products: Annotated[
         list["OrderedProductInputContract"],
