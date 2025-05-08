@@ -29,14 +29,13 @@ class CatalogClient:
         self,
         ids: Iterable[UUID],
     ) -> tuple[GetProductDetailsContract, ...]:
-        # TODO: Modify when contract become known
         body, status_code = await self._http_client.get(
             url=URL(
                 host=self._catalog_settings.HOST,
                 port=self._catalog_settings.PORT,
-                path='/api/products',
+                path="/api/products/by-ids",
                 params={"ids": list(ids)},
-                scheme='http',
+                scheme="http",
             ),
             headers={
                 "API_KEY": self._catalog_settings.API_KEY,
@@ -51,7 +50,7 @@ class CatalogClient:
 
         try:
             return tuple(
-                GetProductDetailsContract.model_validate_json(detail)
+                GetProductDetailsContract.model_validate(detail)
                 for detail in json.loads(body)
             )
         except (ValidationError, JSONDecodeError):

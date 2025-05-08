@@ -29,8 +29,8 @@ class SMTPMailService(OrderMailService, ServiceMailService):
         self._catalog_client = catalog_client
         self._template_loader = Environment(
             loader=PackageLoader(
-                package_name="infrastructure.service",
-                package_path="../templates",
+                package_name="infrastructure.service.mail",
+                package_path="./templates",
             ),
             autoescape=select_autoescape(),
         )
@@ -45,6 +45,7 @@ class SMTPMailService(OrderMailService, ServiceMailService):
 
         await self._smtp_client.send_html(
             receivers=[order.customer_personal_info.email],
+            subject="Дякуємо за замовлення",
             template=customer_template.render(
                 order=order,
                 ordered_products=ordered_product_details,
@@ -70,6 +71,7 @@ class SMTPMailService(OrderMailService, ServiceMailService):
         await asyncio.gather(
             self._smtp_client.send_html(
                 receivers=admins_email.emails,
+                subject="Нове замовлення",
                 template=admin_template.render(
                     order=order,
                     ordered_products=ordered_product_details,
@@ -78,6 +80,7 @@ class SMTPMailService(OrderMailService, ServiceMailService):
             ),
             self._smtp_client.send_html(
                 receivers=[order.customer_personal_info.email],
+                subject="Замовлення вже в оброці",
                 template=customer_template.render(
                     order=order,
                     ordered_products=ordered_product_details,
@@ -98,12 +101,14 @@ class SMTPMailService(OrderMailService, ServiceMailService):
             self._get_ordered_product_details(order=order),
         )
 
-        customer_admin_template = self._template_loader.get_template("failed_order_customer_admin.html")
+        customer_template = self._template_loader.get_template("failed_order_customer.html")
+        admin_template = self._template_loader.get_template("failed_order_admin.html")
 
         await asyncio.gather(
             self._smtp_client.send_html(
                 receivers=admins_email.emails,
-                template=customer_admin_template.render(
+                subject="Не вдалося зарезервувати товари для замовлення",
+                template=admin_template.render(
                     order=order,
                     ordered_products=ordered_product_details,
                     total_price=sum(product.price * product.quantity for product in ordered_product_details),
@@ -111,7 +116,8 @@ class SMTPMailService(OrderMailService, ServiceMailService):
             ),
             self._smtp_client.send_html(
                 receivers=[order.customer_personal_info.email],
-                template=customer_admin_template.render(
+                subject="Замовлення не може бути виконано",
+                template=customer_template.render(
                     order=order,
                     ordered_products=ordered_product_details,
                     total_price=sum(product.price * product.quantity for product in ordered_product_details),
@@ -134,6 +140,7 @@ class SMTPMailService(OrderMailService, ServiceMailService):
                 ordered_products=ordered_product_details,
                 total_price=sum(product.price * product.quantity for product in ordered_product_details),
             ),
+            subject="Замовлення виконано",
         )
 
     async def send_new_callback_request_asked_mail(
@@ -146,6 +153,7 @@ class SMTPMailService(OrderMailService, ServiceMailService):
 
         await self._smtp_client.send_html(
             receivers=admins_email.emails,
+            subject="Заявка на зворотній зв'язок",
             template=admin_template.render(callback_request=callback_request),
         )
 

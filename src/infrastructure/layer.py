@@ -34,7 +34,7 @@ from infrastructure.database.relational.transaction import SQLTransactionManager
 from infrastructure.message_broker.rabbitmq.connection import RabbitMQConnectionManager
 from infrastructure.message_broker.rabbitmq.destination import RabbitMQEventDestination
 from infrastructure.message_broker.rabbitmq.publisher import RabbitMQPublisher
-from infrastructure.service.mail import SMTPMailService
+from infrastructure.service.mail.service import SMTPMailService
 from infrastructure.settings.application import ApplicationSettings
 from infrastructure.settings.catalog import CatalogServiceSettings
 from infrastructure.settings.database import DatabaseSettings

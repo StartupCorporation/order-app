@@ -9,8 +9,9 @@ class SMTPSettings(BaseSettings):
     HOST: str
     PORT: int
     TIMEOUT: int
+    USE_TLS: bool
 
     SENDER_EMAIL: str
 
-    USERNAME: str
-    PASSWORD: str
+    USERNAME: str | None = None
+    PASSWORD: str | None = None

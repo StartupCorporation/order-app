@@ -17,10 +17,11 @@ class SMTPClient:
         self,
         receivers: Iterable[str],
         template: str,
+        subject: str,
     ) -> None:
         message = EmailMessage()
 
-        message["Subject"] = "Link"
+        message["Subject"] = subject
         message["From"] = self._smtp_settings.SENDER_EMAIL
         message["To"] = ", ".join(receivers)
         message.set_content(
@@ -40,4 +41,5 @@ class SMTPClient:
             port=self._smtp_settings.PORT,
             password=self._smtp_settings.PASSWORD,
             username=self._smtp_settings.USERNAME,
+            use_tls=self._smtp_settings.USE_TLS,
         )

@@ -1,9 +1,7 @@
-from uuid import UUID
-
-from pydantic import BaseModel
+from pydantic import UUID4, BaseModel
 
 
 class GetProductDetailsContract(BaseModel):
     name: str
-    id: UUID
+    id: UUID4
     price: int
