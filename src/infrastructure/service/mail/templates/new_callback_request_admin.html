@@ -193,7 +193,7 @@
 
                     <tr style="border-bottom:1px solid #eaeaea;">
                       <td style="padding:16px;width:160px;color:#797878;font-size:14px;vertical-align:top;">Час заявки:</td>
-                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.time_info.created_at }}</td>
+                      <td style="padding:16px;font-size:14px;vertical-align:top;">{{ callback_request.time_info.created_at.strftime("%Y-%m-%d %H:%M:%S") }}</td>
                     </tr>
 
                     <tr>

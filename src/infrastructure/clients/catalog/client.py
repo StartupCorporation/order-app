@@ -37,9 +37,6 @@ class CatalogClient:
                 params={"ids": list(ids)},
                 scheme="http",
             ),
-            headers={
-                "API_KEY": self._catalog_settings.API_KEY,
-            },
         )
 
         if not 200 <= status_code < 300:

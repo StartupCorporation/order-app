@@ -8,4 +8,3 @@ class CatalogServiceSettings(BaseSettings):
 
     HOST: str
     PORT: int
-    API_KEY: str

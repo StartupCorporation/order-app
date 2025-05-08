@@ -22,5 +22,5 @@ class Note(ValueObject):
 
     @staticmethod
     def _check_content(content: str) -> None:
-        if not StringLengthSpecification(min_length=0, max_length=512).is_satisfied_by(value=content):
+        if not StringLengthSpecification(min_length=1, max_length=512).is_satisfied_by(value=content):
             raise NoteContentIsLong()
