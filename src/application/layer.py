@@ -15,8 +15,10 @@ from application.commands.mark_order_as_failed_for_products_reservation.handler 
 from application.commands.start_order_processing.command import StartOrderProcessingCommand
 from application.commands.start_order_processing.handler import StartOrderProcessingCommandHandler
 from domain.order.repository.order import OrderRepository
+from domain.order.service.mail import OrderMailService
 from domain.order.service.order import OrderService
 from domain.service.repository.callback_request import CallbackRequestRepository
+from domain.service.service.mail import ServiceMailService
 
 
 class ApplicationLayer(Layer):
@@ -25,6 +27,7 @@ class ApplicationLayer(Layer):
             command=CreateOrderCommand,
             handler=CreateOrderCommandHandler(
                 order_service=container[OrderService],
+                order_mail_service=container[OrderMailService],
             ),
         )
         container[CommandBus].register(
@@ -32,6 +35,7 @@ class ApplicationLayer(Layer):
             handler=MarkOrderAsFailedForProductsReservationCommandHandler(
                 order_service=container[OrderService],
                 order_repository=container[OrderRepository],
+                order_mail_service=container[OrderMailService],
             ),
         )
         container[CommandBus].register(
@@ -39,12 +43,7 @@ class ApplicationLayer(Layer):
             handler=StartOrderProcessingCommandHandler(
                 order_repository=container[OrderRepository],
                 order_service=container[OrderService],
-            ),
-        )
-        container[CommandBus].register(
-            command=AskForCallbackRequestCommand,
-            handler=AskForCallbackRequestCommandHandler(
-                callback_request_repository=container[CallbackRequestRepository],
+                order_mail_service=container[OrderMailService],
             ),
         )
         container[CommandBus].register(
@@ -52,5 +51,13 @@ class ApplicationLayer(Layer):
             handler=CompleteOrderCommandHandler(
                 order_repository=container[OrderRepository],
                 order_service=container[OrderService],
+                order_mail_service=container[OrderMailService],
+            ),
+        )
+        container[CommandBus].register(
+            command=AskForCallbackRequestCommand,
+            handler=AskForCallbackRequestCommandHandler(
+                callback_request_repository=container[CallbackRequestRepository],
+                service_mail_service=container[ServiceMailService],
             ),
         )

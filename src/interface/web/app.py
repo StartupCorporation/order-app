@@ -8,6 +8,7 @@ from dw_shared_kernel import (
     Container,
     DIContainerProviderMiddleware,
     ExceptionHandlerMiddleware,
+    LifecycleComponentManager,
     SharedKernelInfrastructureLayer,
     get_initialized_di_container,
 )
@@ -25,6 +26,7 @@ from interface.web.routes.order.endpoints import router as order_router
 
 
 class WebApplication:
+
     def __init__(
         self,
         container: Container,
@@ -63,22 +65,21 @@ class WebApplication:
 
     def _set_middlewares(self) -> None:
         self._app.add_middleware(
-            DIContainerProviderMiddleware,
+            DIContainerProviderMiddleware,  # type: ignore
             container=self._container,
         )
-        self._app.add_middleware(ExceptionHandlerMiddleware)
+        self._app.add_middleware(ExceptionHandlerMiddleware)  # type: ignore
         self._app.add_middleware(
-            CORSMiddleware,
+            CORSMiddleware,  # type: ignore
             allow_origins=["*"],
             allow_credentials=True,
             allow_methods=["*"],
             allow_headers=["*"],
         )
-        self._app.add_middleware(PrometheusMetricsMiddleware)
+        self._app.add_middleware(PrometheusMetricsMiddleware)  # type: ignore
 
-    @staticmethod
     @asynccontextmanager
-    async def _app_lifespan(app: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG004
+    async def _app_lifespan(self, app: FastAPI) -> AsyncGenerator[None]:  # noqa: ARG002
         async def _collect_system_usage_metrics() -> None:
             process = psutil.Process()
             process.cpu_percent()
@@ -89,7 +90,9 @@ class WebApplication:
                 await asyncio.sleep(15)
 
         asyncio.create_task(_collect_system_usage_metrics())
-        yield
+
+        async with self._container[LifecycleComponentManager].start():
+            yield
 
     def __call__(self):
         return self._app

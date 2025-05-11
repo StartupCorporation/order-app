@@ -23,7 +23,7 @@ local = [
 web = [
     "psutil",
     "pydantic-settings",
-    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.5.0",
+    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.6.0",
     "phonenumbers",
     "email-validator",
     "aio-pika",
@@ -32,6 +32,9 @@ web = [
     "fastapi",
     "uvicorn",
     "prometheus-client",
+    "aiosmtplib",
+    "jinja2",
+    "httpx",
 ]
 migration = [
     "psycopg2-binary",
@@ -39,13 +42,16 @@ migration = [
 ]
 queue = [
     "pydantic-settings",
-    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.5.0",
+    "dw-shared-kernel@git+https://github.com/StartupCorporation/dw-shared-kernel.git@v0.6.0",
     "phonenumbers",
     "email-validator",
     "aio-pika",
     "pydantic",
     "asyncpg",
     "faststream[rabbit,cli]",
+    "aiosmtplib",
+    "jinja2",
+    "httpx",
 ]
 
 [tool.ruff]
